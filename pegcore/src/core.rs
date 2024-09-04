@@ -1,7 +1,7 @@
 use crate::ast::{CacheResult, CacheType};
 use pegmacro::memoize;
 use std::collections::HashMap;
-
+use std::ops::Range;
 
 #[derive(Default)]
 pub struct Parser {
@@ -9,47 +9,48 @@ pub struct Parser {
     pub cache: Cache,
 }
 
-#[test]
-fn test_macro() {
-    Parser::default().expect("d");
-}
-
 impl Parser {
-    #[memoize(cache = Integer)]
-    pub fn integer(&mut self) -> Option<String> {
-        Some(String::new())
-    }
-
     #[memoize(cache = Expect)]
     pub fn expect(&mut self, s: &'static str) -> Option<&'static str> {
         let pos = self.stream.mark();
         for ch in s.chars() {
             let sn = self.stream.next();
             if !matches!(sn, Some(d) if d == ch) {
-                self.stream.reset(pos);
+                self.stream.jump(pos);
                 return None;
             }
         }
         Some(s)
     }
 
-    pub fn pla(&mut self, ch: char) -> Option<char> {
+    pub fn scan(&mut self, filter: fn(char) -> bool) -> Option<char> {
         let pos = self.stream.mark();
-        let saw = self.stream.next();
-        self.stream.reset(pos);
-        if Some(ch) == saw {
-            saw
+        let saw = self.stream.next()?;
+        if filter(saw) {
+            Some(saw)
+        } else {
+            self.stream.jump(pos);
+            None
+        }
+    }
+
+    pub fn pl(&mut self, ch: char) -> Option<char> {
+        let pos = self.stream.mark();
+        let saw = self.stream.next()?;
+        self.stream.jump(pos);
+        if ch == saw {
+            Some(saw)
         } else {
             None
         }
     }
 
-    pub fn nla(&mut self, ch: char) -> Option<char> {
+    pub fn nl(&mut self, ch: char) -> Option<char> {
         let pos = self.stream.mark();
-        let saw = self.stream.next();
-        self.stream.reset(pos);
-        if Some(ch) != saw {
-            saw
+        let saw = self.stream.next()?;
+        self.stream.jump(pos);
+        if ch != saw {
+            Some(saw)
         } else {
             None
         }
@@ -67,7 +68,7 @@ impl Stream {
         self.cursor
     }
 
-    pub fn reset(&mut self, pos: usize) {
+    pub fn jump(&mut self, pos: usize) {
         self.cursor = pos
     }
 }

@@ -35,17 +35,17 @@ pub fn memoize(meta: TokenStream, body: TokenStream) -> TokenStream {
 
     let fast = quote! {
         let __pos__ = self.stream.mark();
-        let __cache_type__ = CacheType::#cache #args;
+        let __cache_type__ = crate::ast::CacheType::#cache #args;
         if let Some(cache) = self.cache.get(__pos__, __cache_type__) {
-            let (end, cr) = cache;
-            self.stream.reset(end);
-            return cr.into()
+            let (__end__, __cache_result__) = cache;
+            self.stream.jump(__end__);
+            return __cache_result__.into()
         }
     };
 
     let cache = quote! {
         let result = || #rt #block();
-        let __cache_result__ = CacheResult::#cache(result.clone());
+        let __cache_result__ = crate::ast::CacheResult::#cache(result.clone());
         let __end__ = self.stream.mark();
         self.cache.insert(__pos__, __cache_type__, __end__, __cache_result__);
         result
@@ -78,10 +78,10 @@ pub fn impl_cr_into_inner(body: TokenStream) -> TokenStream {
         };
         let cr = &x.ident;
         quote! {
-            impl From<CacheResult> for #inner {
-                fn from(value: CacheResult) -> Self {
+            impl From<crate::ast::CacheResult> for #inner {
+                fn from(value: crate::ast::CacheResult) -> Self {
                     match value {
-                        CacheResult::#cr(inner) => inner,
+                        crate::ast::CacheResult::#cr(inner) => inner,
                         _ => panic!("cache unmatched")
                     }
                 }
