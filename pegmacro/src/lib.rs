@@ -1,12 +1,12 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Expr, FnArg, ItemFn, Meta, MetaNameValue, Pat, PatType};
+use syn::{parse_macro_input, Data, DeriveInput, Expr, Fields, FieldsUnnamed, FnArg, ItemFn, Meta, MetaNameValue, PatType};
 
 #[proc_macro_attribute]
 pub fn memoize(meta: TokenStream, body: TokenStream) -> TokenStream {
     let meta = parse_macro_input!(meta as Meta);
     let body = parse_macro_input!(body as ItemFn);
-    
+
     let signature = body.sig;
     let rt = &signature.output;
     let block = body.block;
@@ -20,17 +20,17 @@ pub fn memoize(meta: TokenStream, body: TokenStream) -> TokenStream {
         _ => panic!("cache argument is missing"),
     };
 
-    let args = signature.inputs.iter()
+    let mut args = signature.inputs.iter()
         .filter_map(|x| match x {
             FnArg::Typed(PatType { pat, .. }) => Some(pat),
             _ => None
         })
-        .collect::<Vec<&Box<Pat>>>();
+        .peekable();
 
-    let args = if args.is_empty() {
-        quote! {}
-    } else {
+    let args = if args.peek().is_some() {
         quote! { (#(#args),*) }
+    } else {
+        quote! {}
     };
 
     let fast = quote! {
@@ -56,6 +56,41 @@ pub fn memoize(meta: TokenStream, body: TokenStream) -> TokenStream {
             #fast
             #cache
         }
+    };
+
+    extended.into()
+}
+
+
+#[proc_macro_derive(Unwrap)]
+pub fn impl_cr_into_inner(body: TokenStream) -> TokenStream {
+    let body = parse_macro_input!(body as DeriveInput);
+
+    let variants = match &body.data {
+        Data::Enum(e) => &e.variants,
+        _ => panic!("this only works with enum")
+    };
+
+    let variants = variants.iter().map(|x| {
+        let inner = match &x.fields {
+            Fields::Unnamed(FieldsUnnamed { unnamed, .. }) => unnamed,
+            _ => panic!("enums need to be unnamed")
+        };
+        let cr = &x.ident;
+        quote! {
+            impl From<CacheResult> for #inner {
+                fn from(value: CacheResult) -> Self {
+                    match value {
+                        CacheResult::#cr(inner) => inner,
+                        _ => panic!("cache unmatched")
+                    }
+                }
+            }
+        }
+    });
+
+    let extended = quote! {
+        #(#variants)*
     };
 
     extended.into()
