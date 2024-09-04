@@ -10,6 +10,7 @@ pub enum CacheResult {
     Integer(Option<String>),
 }
 
+
 impl From<CacheResult> for Option<&'static str> {
     fn from(value: CacheResult) -> Self {
         match value {

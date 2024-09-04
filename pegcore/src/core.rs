@@ -1,6 +1,7 @@
+use crate::ast::{CacheResult, CacheType};
+use pegmacro::memoize;
 use std::collections::HashMap;
 
-use crate::ast::{CacheResult, CacheType};
 
 #[derive(Default)]
 pub struct Parser {
@@ -14,12 +15,12 @@ fn test_macro() {
 }
 
 impl Parser {
-    #[pegmacro::memoize(cache = Integer)]
-    fn integer(&mut self) -> Option<String> {
+    #[memoize(cache = Integer)]
+    pub fn integer(&mut self) -> Option<String> {
         Some(String::new())
     }
 
-    #[pegmacro::memoize(cache = Expect)]
+    #[memoize(cache = Expect)]
     fn expect(&mut self, s: &'static str) -> Option<&'static str> {
         let pos = self.stream.mark();
         for ch in s.chars() {
