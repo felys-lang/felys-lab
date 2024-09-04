@@ -8,8 +8,19 @@ pub struct Parser {
     pub cache: Cache,
 }
 
+#[test]
+fn test_macro() {
+    Parser::default().expect("d");
+}
+
 impl Parser {
-    pub fn expect(&mut self, s: &'static str) -> Option<&'static str> {
+    #[pegmacro::memoize(cache = Integer)]
+    fn integer(&mut self) -> Option<String> {
+        Some(String::new())
+    }
+
+    #[pegmacro::memoize(cache = Expect)]
+    fn expect(&mut self, s: &'static str) -> Option<&'static str> {
         let pos = self.stream.mark();
         for ch in s.chars() {
             let sn = self.stream.next();
@@ -58,11 +69,14 @@ impl Stream {
     pub fn reset(&mut self, pos: usize) {
         self.cursor = pos
     }
+}
 
-    pub fn next(&mut self) -> Option<char> {
-        let ch = self.body.chars().nth(self.cursor);
+impl Iterator for Stream {
+    type Item = char;
+    fn next(&mut self) -> Option<Self::Item> {
+        let ch = self.body.chars().nth(self.cursor)?;
         self.cursor += 1;
-        ch
+        Some(ch)
     }
 }
 
