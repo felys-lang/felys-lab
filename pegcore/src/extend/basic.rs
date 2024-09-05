@@ -12,7 +12,7 @@ impl Parser {
             while let Some(more) = self.scan(|c| c.is_ascii_alphanumeric() || c == '_') {
                 body.push(more)
             }
-            Some(Name(body))
+            Some(body)
         }() {
             return Some(body);
         } else {
@@ -26,9 +26,8 @@ impl Parser {
         let pos = self.stream.mark();
         let mut cut = false;
         if let Some(body) = || -> Option<Integer> {
-            self.expect("0")?;
+            self.expect("0x")?;
             cut = true;
-            self.expect("x")?;
             let first = self.scan(|c| c.is_ascii_hexdigit())?;
             let mut body = String::from(first);
             while let Some(more) = self.scan(|c| c.is_ascii_hexdigit()) {
@@ -37,11 +36,42 @@ impl Parser {
             Some(Integer::Base16(body))
         }() {
             return Some(body);
-        } else if cut {
+        } else {
             self.stream.jump(pos)
         }
         if cut { return None; }
         if let Some(body) = || -> Option<Integer> {
+            self.expect("0o")?;
+            cut = true;
+            let first = self.scan(|c| matches!(c, '0'..='7'))?;
+            let mut body = String::from(first);
+            while let Some(more) = self.scan(|c| matches!(c, '0'..='7')) {
+                body.push(more)
+            }
+            Some(Integer::Base8(body))
+        }() {
+            return Some(body);
+        } else {
+            self.stream.jump(pos)
+        }
+        if cut { return None; }
+        if let Some(body) = || -> Option<Integer> {
+            self.expect("0b")?;
+            cut = true;
+            let first = self.scan(|c| matches!(c, '0'|'1'))?;
+            let mut body = String::from(first);
+            while let Some(more) = self.scan(|c| matches!(c, '0'|'1')) {
+                body.push(more)
+            }
+            Some(Integer::Base2(body))
+        }() {
+            return Some(body);
+        } else {
+            self.stream.jump(pos)
+        }
+        if cut { return None; }
+        if let Some(body) = || -> Option<Integer> {
+            self.nl('0')?;
             let first = self.scan(|c| c.is_ascii_digit())?;
             let mut body = String::from(first);
             while let Some(more) = self.scan(|c| c.is_ascii_digit()) {
@@ -62,18 +92,17 @@ impl Parser {
         if let Some(body) = || -> Option<Decimal> {
             self.nl('0')?;
             let first = self.scan(|c| c.is_ascii_digit())?;
-            let mut before = String::from(first);
+            let mut whole = String::from(first);
             while let Some(more) = self.scan(|c| c.is_ascii_digit()) {
-                before.push(more)
+                whole.push(more)
             }
             self.expect(".")?;
             let first = self.scan(|c| c.is_ascii_digit())?;
-            let mut after = String::from(first);
+            let mut frac = String::from(first);
             while let Some(more) = self.scan(|c| c.is_ascii_digit()) {
-                after.push(more)
+                frac.push(more)
             }
-            let formatted = format!("{}.{}", before, after);
-            Some(Decimal(formatted))
+            Some(Decimal { whole, frac })
         }() {
             return Some(body);
         } else {

@@ -6,28 +6,21 @@ mod core;
 mod extend;
 
 pub fn parse(code: String) {
-    let result = Parser {
-        stream: Stream {
-            body: code,
-            cursor: 0,
-        },
-        cache: Cache {
-            body: Default::default(),
-            verbose: true,
-            hit: 0,
-        },
-    }.program();
-    if result.is_none() {
-        println!("parsing failed")
+    let mut parser = Parser::new(code, true);
+    if parser.program().is_none() {
+        let leftover = parser.stream.collect::<String>();
+        println!("leftover: `{}`", leftover);
     }
 }
 
 impl Parser {
     fn program(&mut self) -> Option<Program> {
         let body = self.integer()?;
+        let pos = self.stream.mark();
         if self.stream.next().is_none() {
             Some(Program(body))
         } else {
+            self.stream.jump(pos);
             None
         }
     }
@@ -35,5 +28,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("0x123".to_string())
+    parse("0b111134".to_string())
 }

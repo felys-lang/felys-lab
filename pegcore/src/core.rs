@@ -9,6 +9,20 @@ pub struct Parser {
 
 #[allow(dead_code)]
 impl Parser {
+    pub fn new(code: String, v: bool) -> Self {
+        Self {
+            stream: Stream {
+                body: code,
+                cursor: 0,
+            },
+            cache: Cache {
+                body: HashMap::new(),
+                verbose: v,
+                hit: 0,
+            },
+        }
+    }
+
     #[memoize(cache = Expect)]
     pub fn expect(&mut self, s: &'static str) -> Option<&'static str> {
         let pos = self.stream.mark();

@@ -2,17 +2,21 @@ use pegmacro::Unwrap;
 
 pub struct Program(pub Integer);
 
-#[derive(Debug, Clone)]
-pub struct Name(pub String);
+pub type Name = String;
 
 #[derive(Debug, Clone)]
 pub enum Integer {
     Base16(String),
     Base10(String),
+    Base8(String),
+    Base2(String),
 }
 
 #[derive(Debug, Clone)]
-pub struct Decimal(pub String);
+pub struct Decimal {
+    pub whole: String,
+    pub frac: String,
+}
 
 #[derive(Debug, Clone)]
 pub enum Boolean {
