@@ -6,7 +6,7 @@ mod core;
 mod extend;
 
 pub fn parse(code: String) {
-    let _ = Parser {
+    let result = Parser {
         stream: Stream {
             body: code,
             cursor: 0,
@@ -17,20 +17,19 @@ pub fn parse(code: String) {
             hit: 0,
         },
     }.program();
+    if result.is_none() {
+        println!("parsing failed")
+    }
 }
 
 impl Parser {
     fn program(&mut self) -> Option<Program> {
-        let pos = self.stream.mark();
-        if let Some(body) = || -> Option<Program> {
-            let body = self.integer()?;
+        let body = self.integer()?;
+        if self.stream.next().is_none() {
             Some(Program(body))
-        }() {
-            return Some(body);
         } else {
-            self.stream.jump(pos)
+            None
         }
-        None
     }
 }
 
