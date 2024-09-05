@@ -91,7 +91,7 @@ impl Cache {
         if let Some(res) = self.body.get(&(pos, ct)) {
             if self.verbose {
                 let (end, cr) = res;
-                println!("[{}-{}]:\t{:?} => {:?}", pos, end, ct, cr)
+                println!("{}\t{}\t{:?} => {:?}", pos, end, ct, cr)
             }
             self.hit += 1;
             Some(res.clone())
@@ -102,7 +102,7 @@ impl Cache {
 
     pub fn insert(&mut self, pos: usize, ct: CacheType, end: usize, cr: CacheResult) {
         if self.verbose {
-            println!("[{}-{}]:\t{:?} => {:?}", pos, end, ct, cr)
+            println!("{}\t{}\t{:?} => {:?}", pos, end, ct, cr)
         }
         if self.body.insert((pos, ct), (end, cr)).is_some() {
             panic!("cache conflicted")
