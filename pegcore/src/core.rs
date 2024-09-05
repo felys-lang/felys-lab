@@ -1,14 +1,13 @@
-use crate::ast::{CacheResult, CacheType};
+use crate::ast::*;
 use pegmacro::memoize;
 use std::collections::HashMap;
-use std::ops::Range;
 
-#[derive(Default)]
 pub struct Parser {
     pub stream: Stream,
     pub cache: Cache,
 }
 
+#[allow(dead_code)]
 impl Parser {
     #[memoize(cache = Expect)]
     pub fn expect(&mut self, s: &'static str) -> Option<&'static str> {
@@ -57,10 +56,9 @@ impl Parser {
     }
 }
 
-#[derive(Default)]
 pub struct Stream {
-    body: String,
-    cursor: usize,
+    pub body: String,
+    pub cursor: usize,
 }
 
 impl Stream {
@@ -82,11 +80,10 @@ impl Iterator for Stream {
     }
 }
 
-#[derive(Default)]
 pub struct Cache {
-    body: HashMap<(usize, CacheType), (usize, CacheResult)>,
-    verbose: bool,
-    hit: usize,
+    pub body: HashMap<(usize, CacheType), (usize, CacheResult)>,
+    pub verbose: bool,
+    pub hit: usize,
 }
 
 impl Cache {
@@ -94,7 +91,7 @@ impl Cache {
         if let Some(res) = self.body.get(&(pos, ct)) {
             if self.verbose {
                 let (end, cr) = res;
-                println!("{}\t{}\t{:?} => {:?}", pos, end, ct, cr)
+                println!("[{}-{}]:\t{:?} => {:?}", pos, end, ct, cr)
             }
             self.hit += 1;
             Some(res.clone())
@@ -105,7 +102,7 @@ impl Cache {
 
     pub fn insert(&mut self, pos: usize, ct: CacheType, end: usize, cr: CacheResult) {
         if self.verbose {
-            println!("{}\t{}\t{:?} => {:?}", pos, end, ct, cr)
+            println!("[{}-{}]:\t{:?} => {:?}", pos, end, ct, cr)
         }
         if self.body.insert((pos, ct), (end, cr)).is_some() {
             panic!("cache conflicted")
