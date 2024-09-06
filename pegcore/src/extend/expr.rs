@@ -3,6 +3,80 @@ use crate::core::Parser;
 use pegmacro::{lecursion, memoize};
 
 impl Parser {
+    #[lecursion(cache = Comparison)]
+    pub fn comparison(&mut self) -> Option<Comparison> {
+        let pos = self.stream.mark();
+        if let Some(result) = || -> Option<Comparison> {
+            let lhs = self.comparison()?;
+            self.expect("==")?;
+            let add = self.additive()?;
+            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Eq, rhs: add })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Comparison> {
+            let lhs = self.comparison()?;
+            self.expect("!=")?;
+            let add = self.additive()?;
+            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Ne, rhs: add })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Comparison> {
+            let lhs = self.comparison()?;
+            self.expect(">")?;
+            let add = self.additive()?;
+            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Gt, rhs: add })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Comparison> {
+            let lhs = self.comparison()?;
+            self.expect("<")?;
+            let add = self.additive()?;
+            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Lt, rhs: add })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Comparison> {
+            let lhs = self.comparison()?;
+            self.expect(">=")?;
+            let add = self.additive()?;
+            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Ge, rhs: add })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Comparison> {
+            let lhs = self.comparison()?;
+            self.expect("<=")?;
+            let add = self.additive()?;
+            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Le, rhs: add })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Comparison> {
+            let add = self.additive()?;
+            Some(Comparison::Additive(add))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        None
+    }
+
     #[lecursion(cache = Additive)]
     pub fn additive(&mut self) -> Option<Additive> {
         let pos = self.stream.mark();

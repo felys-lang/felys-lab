@@ -47,22 +47,11 @@ impl Parser {
         }
     }
 
-    pub fn pl(&mut self, ch: char) -> Option<char> {
+    pub fn lookahead(&mut self, filter: fn(char) -> bool) -> Option<char> {
         let pos = self.stream.mark();
-        let saw = self.stream.next()?;
+        let saw = self.stream.next().unwrap_or('\u{0}');
         self.stream.jump(pos);
-        if ch == saw {
-            Some(saw)
-        } else {
-            None
-        }
-    }
-
-    pub fn nl(&mut self, ch: char) -> Option<char> {
-        let pos = self.stream.mark();
-        let saw = self.stream.next()?;
-        self.stream.jump(pos);
-        if ch != saw {
+        if filter(saw) {
             Some(saw)
         } else {
             None

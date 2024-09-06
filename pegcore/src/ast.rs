@@ -1,6 +1,26 @@
 use pegmacro::CRInner;
 
-pub type Program = Additive;
+pub type Program = Comparison;
+
+#[derive(Debug, Clone)]
+pub enum Comparison {
+    Comparison {
+        lhs: Box<Comparison>,
+        op: ComOp,
+        rhs: Additive,
+    },
+    Additive(Additive),
+}
+
+#[derive(Debug, Clone)]
+pub enum ComOp {
+    Gt,
+    Ge,
+    Lt,
+    Le,
+    Eq,
+    Ne,
+}
 
 #[derive(Debug, Clone)]
 pub enum Additive {
@@ -17,7 +37,6 @@ pub enum AddOp {
     Add,
     Sub,
 }
-
 
 #[derive(Debug, Clone)]
 pub enum Multiplicity {
@@ -107,6 +126,7 @@ pub enum Boolean {
 pub enum CacheType {
     Expect(&'static str),
     Multiplicity,
+    Comparison,
     Evaluation,
     Namespace,
     Additive,
@@ -122,6 +142,7 @@ pub enum CacheType {
 pub enum CacheResult {
     Expect(Option<&'static str>),
     Multiplicity(Option<Multiplicity>),
+    Comparison(Option<Comparison>),
     Evaluation(Option<Evaluation>),
     Namespace(Option<Namespace>),
     Additive(Option<Additive>),

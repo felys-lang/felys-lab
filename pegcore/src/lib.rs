@@ -15,7 +15,7 @@ pub fn parse(code: String) {
 
 impl Parser {
     fn program(&mut self) -> Option<Program> {
-        let body = self.additive()?;
+        let body = self.comparison()?;
         let pos = self.stream.mark();
         if self.stream.next().is_none() {
             Some(body)
@@ -28,5 +28,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("1--1".to_string())
+    parse("0-0.0".to_string())
 }

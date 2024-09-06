@@ -71,7 +71,18 @@ impl Parser {
         }
         if cut { return None; }
         if let Some(body) = || -> Option<Integer> {
-            self.nl('0')?;
+            self.expect("0")?;
+            cut = true;
+            self.lookahead(|c| !c.is_ascii_digit())?;
+            Some(Integer::Base10("0".to_string()))
+        }() {
+            println!("yes");
+            return Some(body);
+        } else {
+            self.stream.jump(pos)
+        }
+        if cut { return None; }
+        if let Some(body) = || -> Option<Integer> {
             let first = self.scan(|c| c.is_ascii_digit())?;
             let mut body = String::from(first);
             while let Some(more) = self.scan(|c| c.is_ascii_digit()) {
@@ -90,7 +101,6 @@ impl Parser {
     pub fn decimal(&mut self) -> Option<Decimal> {
         let pos = self.stream.mark();
         if let Some(body) = || -> Option<Decimal> {
-            self.nl('0')?;
             let first = self.scan(|c| c.is_ascii_digit())?;
             let mut whole = String::from(first);
             while let Some(more) = self.scan(|c| c.is_ascii_digit()) {
