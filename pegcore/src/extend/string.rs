@@ -1,5 +1,3 @@
 use crate::core::Parser;
 
-impl Parser {
-    
-}
+impl Parser {}

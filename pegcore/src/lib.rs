@@ -15,10 +15,10 @@ pub fn parse(code: String) {
 
 impl Parser {
     fn program(&mut self) -> Option<Program> {
-        let body = self.primary()?;
+        let body = self.additive()?;
         let pos = self.stream.mark();
         if self.stream.next().is_none() {
-            Some(Program(body))
+            Some(body)
         } else {
             self.stream.jump(pos);
             None
@@ -28,5 +28,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("std::lib::core.foo()().bar().fuzz".to_string())
+    parse("1--1".to_string())
 }
