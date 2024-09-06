@@ -1,6 +1,15 @@
 use pegmacro::Unwrap;
 
-pub struct Program(pub Integer);
+pub struct Program(pub Namespace);
+
+#[derive(Debug, Clone)]
+pub enum Namespace {
+    Space {
+        ns: Box<Namespace>,
+        name: Name,
+    },
+    Name(Name),
+}
 
 pub type Name = String;
 
@@ -28,6 +37,7 @@ pub enum Boolean {
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum CacheType {
     Expect(&'static str),
+    Namespace,
     Boolean,
     Decimal,
     Integer,
@@ -37,6 +47,7 @@ pub enum CacheType {
 #[derive(Debug, Clone, Unwrap)]
 pub enum CacheResult {
     Expect(Option<&'static str>),
+    Namespace(Option<Namespace>),
     Boolean(Option<Boolean>),
     Decimal(Option<Decimal>),
     Integer(Option<Integer>),
