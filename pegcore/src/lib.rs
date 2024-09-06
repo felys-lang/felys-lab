@@ -8,7 +8,11 @@ mod vb;
 
 pub fn parse(code: String) {
     let mut parser = Parser::new(code, Verbose::Core);
-    if parser.program().is_none() {
+    let result = parser.program();
+    if matches!(parser.cache.verbose, Verbose::Full | Verbose::Core) {
+        println!("cached {} results with {} hits", parser.cache.body.len(), parser.cache.hit);
+    }
+    if result.is_none() {
         let leftover = parser.stream.collect::<String>();
         println!("leftover: \"{}\"", leftover);
     }
@@ -29,5 +33,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("(1).d-0".to_string())
+    parse("(std::hello()+world).say()".to_string())
 }
