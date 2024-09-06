@@ -94,7 +94,7 @@ impl Cache {
         if let Some(res) = self.body.get(&(pos, ct)) {
             if self.verbose {
                 let (end, cr) = res;
-                println!("hit\t\t{:<7} {:<7} {:?} => {:?}", pos, end, ct, cr)
+                println!("hit\t\t{:<7} {:<7} {:?} => {}", pos, end, ct, cr)
             }
             self.hit += 1;
             Some(res.clone())
@@ -106,11 +106,11 @@ impl Cache {
 
     pub fn insert(&mut self, pos: usize, ct: CacheType, end: usize, cr: CacheResult) {
         if self.verbose {
-            println!("cache\t{:<7} {:<7} {:?} => {:?}", pos, end, ct, cr)
+            println!("cache\t{:<7} {:<7} {:?} => {}", pos, end, ct, cr)
         }
         if let Some(cache) = self.body.insert((pos, ct), (end, cr)) {
             let (end, cr) = cache;
-            println!("drop\t{:<7} {:<7} {:?} => {:?}", pos, end, ct, cr)
+            println!("drop\t{:<7} {:<7} {:?} => {}", pos, end, ct, cr)
         }
     }
 }

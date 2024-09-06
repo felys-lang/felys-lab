@@ -1,4 +1,4 @@
-use pegmacro::CRInner;
+use pegmacro::CR;
 
 pub type Program = Expression;
 
@@ -160,7 +160,7 @@ pub enum CacheType {
     Name,
 }
 
-#[derive(Debug, Clone, CRInner)]
+#[derive(Debug, Clone, CR)]
 pub enum CacheResult {
     Expect(Option<&'static str>),
     Multiplicity(Option<Multiplicity>),

@@ -4,6 +4,7 @@ use crate::core::*;
 mod ast;
 mod core;
 mod extend;
+mod vb;
 
 pub fn parse(code: String) {
     let mut parser = Parser::new(code, true);
@@ -28,5 +29,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("(1).d".to_string())
+    parse("(1).d-0".to_string())
 }

@@ -123,7 +123,7 @@ pub fn lecursion(meta: TokenStream, body: TokenStream) -> TokenStream {
 }
 
 
-#[proc_macro_derive(CRInner)]
+#[proc_macro_derive(CR)]
 pub fn impl_cr_into_inner(body: TokenStream) -> TokenStream {
     let body = parse_macro_input!(body as DeriveInput);
 
@@ -132,7 +132,7 @@ pub fn impl_cr_into_inner(body: TokenStream) -> TokenStream {
         _ => panic!("this only works with enum")
     };
 
-    let variants = variants.iter().map(|x| {
+    let from = variants.iter().map(|x| {
         let inner = match &x.fields {
             Fields::Unnamed(FieldsUnnamed { unnamed, .. }) => unnamed,
             _ => panic!("enums need to be unnamed")
@@ -150,8 +150,25 @@ pub fn impl_cr_into_inner(body: TokenStream) -> TokenStream {
         }
     });
 
+    let display = variants.iter().map(|x| {
+        let cr = &x.ident;
+        quote! {
+            crate::ast::CacheResult::#cr(x) => match x {
+                Some(i) => write!(f, "{}", i),
+                None => write!(f, "None"),
+            }
+        }
+    });
+
     let extended = quote! {
-        #(#variants)*
+        #(#from)*
+        impl std::fmt::Display for crate::ast::CacheResult {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                match self {
+                    #(#display)*
+                }
+            }
+        }
     };
 
     extended.into()
