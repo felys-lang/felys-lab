@@ -7,7 +7,6 @@ pub struct Parser {
     pub cache: Cache,
 }
 
-#[allow(dead_code)]
 impl Parser {
     pub fn new(code: String, v: Verbose) -> Self {
         Self {
@@ -90,23 +89,24 @@ pub struct Cache {
 }
 
 #[allow(dead_code)]
+#[derive(PartialOrd, PartialEq)]
 pub enum Verbose {
-    Full,
+    None,
     Core,
-    None
+    Full,
 }
 
 impl Cache {
     pub fn get(&mut self, pos: usize, ct: CacheType) -> Option<(usize, CacheResult)> {
         if let Some(res) = self.body.get(&(pos, ct)) {
-            if matches!(self.verbose, Verbose::Full | Verbose::Core) {
+            if self.verbose >= Verbose::Core {
                 let (end, cr) = res;
                 println!("> hit\t\t{:<11} {:<23} {:<11} {}", pos, format!("{:?}", ct), end, cr)
             }
             self.hit += 1;
             Some(res.clone())
         } else {
-            if matches!(self.verbose, Verbose::Full) {
+            if self.verbose >= Verbose::Full {
                 println!("> dne\t\t{:<11} {:?}", pos, ct);
             }
             None
@@ -114,12 +114,12 @@ impl Cache {
     }
 
     pub fn insert(&mut self, pos: usize, ct: CacheType, end: usize, cr: CacheResult) {
-        if matches!(self.verbose, Verbose::Full | Verbose::Core) {
+        if self.verbose >= Verbose::Core {
             println!("> cache\t\t{:<11} {:<23} {:<11} {}", pos, format!("{:?}", ct), end, cr)
         }
         if let Some(cache) = self.body.insert((pos, ct), (end, cr)) {
             let (end, cr) = cache;
-            if matches!(self.verbose, Verbose::Full | Verbose::Core) {
+            if self.verbose >= Verbose::Core {
                 println!("> drop\t\t{:<11} {:<23} {:<11} {}", pos, format!("{:?}", ct), end, cr)
             }
         }
