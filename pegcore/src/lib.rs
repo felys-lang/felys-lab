@@ -15,7 +15,7 @@ pub fn parse(code: String) {
 
 impl Parser {
     fn program(&mut self) -> Option<Program> {
-        let body = self.namespace()?;
+        let body = self.primary()?;
         let pos = self.stream.mark();
         if self.stream.next().is_none() {
             Some(Program(body))
@@ -28,5 +28,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("std::lib::core::foo::bar".to_string())
+    parse("std::lib::core.foo()().bar().fuzz".to_string())
 }

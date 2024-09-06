@@ -1,6 +1,29 @@
 use pegmacro::CRInner;
 
-pub struct Program(pub Namespace);
+pub struct Program(pub Primary);
+
+#[derive(Debug, Clone)]
+pub struct Expression;
+
+#[derive(Debug, Clone)]
+pub enum Primary {
+    Evaluation(Evaluation),
+    Integer(Integer),
+    Decimal(Decimal),
+    Boolean(Boolean),
+}
+
+#[derive(Debug, Clone)]
+pub enum Evaluation {
+    Call {
+        ident: Box<Evaluation>,
+    },
+    Member {
+        ident: Box<Evaluation>,
+        member: Name,
+    },
+    Namespace(Namespace)
+}
 
 #[derive(Debug, Clone)]
 pub enum Namespace {
@@ -37,7 +60,9 @@ pub enum Boolean {
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum CacheType {
     Expect(&'static str),
+    Evaluation,
     Namespace,
+    Primary,
     Boolean,
     Decimal,
     Integer,
@@ -47,7 +72,9 @@ pub enum CacheType {
 #[derive(Debug, Clone, CRInner)]
 pub enum CacheResult {
     Expect(Option<&'static str>),
+    Evaluation(Option<Evaluation>),
     Namespace(Option<Namespace>),
+    Primary(Option<Primary>),
     Boolean(Option<Boolean>),
     Decimal(Option<Decimal>),
     Integer(Option<Integer>),

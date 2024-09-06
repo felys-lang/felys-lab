@@ -105,27 +105,19 @@ expr_mul:
 
 expr_unary:
     \ (`+` \ `-` \ `not`) ~ expr_unary
-    \ expr_subscript
-
-expr_subscript:
-    \ expr_primary `[` ~ expression `]`
     \ expr_primary
 
 expr_primary:
     \ `(` ~ expression `)`
-    \ expr_member
+    \ expr_primary
     \ string
     \ integer
     \ decimal
     \ boolean
-
-expr_func_call:
-    \ expr_func_call `(` ~ args? `)` `?`?
-    \ expr_get_member
-
-expr_get_member:
-    \ expr_get_member `.` ~ name
-    \ expr_func_call
+    
+expr_primary:
+    \ expr_primary `(` ~ args? `)` `?`?
+    \ expr_primary `.` ~ name
     \ expr_namespace
 
 args:
