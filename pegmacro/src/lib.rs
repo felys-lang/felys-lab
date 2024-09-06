@@ -34,20 +34,20 @@ pub fn memoize(meta: TokenStream, body: TokenStream) -> TokenStream {
     };
 
     let fast = quote! {
-        let __pos__ = self.stream.mark();
-        let __cache_type__ = crate::ast::CacheType::#cache #args;
-        if let Some(cache) = self.cache.get(__pos__, __cache_type__) {
-            let (__end__, __cache_result__) = cache;
-            self.stream.jump(__end__);
-            return __cache_result__.into()
+        let __m_pos = self.stream.mark();
+        let __m_cache_type = crate::ast::CacheType::#cache #args;
+        if let Some(cache) = self.cache.get(__m_pos, __m_cache_type) {
+            let (__m_end, __m_cache_result) = cache;
+            self.stream.jump(__m_end);
+            return __m_cache_result.into()
         }
     };
 
     let cache = quote! {
         let result = || #rt #block();
-        let __cache_result__ = crate::ast::CacheResult::#cache(result.clone());
-        let __end__ = self.stream.mark();
-        self.cache.insert(__pos__, __cache_type__, __end__, __cache_result__);
+        let __m_cache_result = crate::ast::CacheResult::#cache(result.clone());
+        let __m_end = self.stream.mark();
+        self.cache.insert(__m_pos, __m_cache_type, __m_end, __m_cache_result);
         result
     };
 
