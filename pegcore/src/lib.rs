@@ -15,7 +15,7 @@ pub fn parse(code: String) {
 
 impl Parser {
     fn program(&mut self) -> Option<Program> {
-        let body = self.comparison()?;
+        let body = self.logical()?;
         let pos = self.stream.mark();
         if self.stream.next().is_none() {
             Some(body)
@@ -28,5 +28,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("11.11.to_string()".to_string())
+    parse("(1).d".to_string())
 }

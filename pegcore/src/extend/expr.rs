@@ -3,6 +3,50 @@ use crate::core::Parser;
 use pegmacro::{lecursion, memoize};
 
 impl Parser {
+    #[lecursion(cache = Logical)]
+    pub fn logical(&mut self) -> Option<Logical> {
+        let pos = self.stream.mark();
+        if let Some(result) = || -> Option<Logical> {
+            let lhs = self.logical()?;
+            self.expect("and")?;
+            let comp = self.comparison()?;
+            Some(Logical::Rec { lhs: Box::new(lhs), op: LogOp::And, rhs: comp })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Logical> {
+            let lhs = self.logical()?;
+            self.expect("xor")?;
+            let comp = self.comparison()?;
+            Some(Logical::Rec { lhs: Box::new(lhs), op: LogOp::Xor, rhs: comp })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Logical> {
+            let lhs = self.logical()?;
+            self.expect("or")?;
+            let comp = self.comparison()?;
+            Some(Logical::Rec { lhs: Box::new(lhs), op: LogOp::Or, rhs: comp })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Logical> {
+            let comp = self.comparison()?;
+            Some(Logical::Plain(comp))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        None
+    }
+
     #[lecursion(cache = Comparison)]
     pub fn comparison(&mut self) -> Option<Comparison> {
         let pos = self.stream.mark();
@@ -10,7 +54,7 @@ impl Parser {
             let lhs = self.comparison()?;
             self.expect("==")?;
             let add = self.additive()?;
-            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Eq, rhs: add })
+            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Eq, rhs: add })
         }() {
             return Some(result);
         } else {
@@ -20,7 +64,7 @@ impl Parser {
             let lhs = self.comparison()?;
             self.expect("!=")?;
             let add = self.additive()?;
-            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Ne, rhs: add })
+            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Ne, rhs: add })
         }() {
             return Some(result);
         } else {
@@ -30,7 +74,7 @@ impl Parser {
             let lhs = self.comparison()?;
             self.expect(">")?;
             let add = self.additive()?;
-            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Gt, rhs: add })
+            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Gt, rhs: add })
         }() {
             return Some(result);
         } else {
@@ -40,7 +84,7 @@ impl Parser {
             let lhs = self.comparison()?;
             self.expect("<")?;
             let add = self.additive()?;
-            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Lt, rhs: add })
+            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Lt, rhs: add })
         }() {
             return Some(result);
         } else {
@@ -50,7 +94,7 @@ impl Parser {
             let lhs = self.comparison()?;
             self.expect(">=")?;
             let add = self.additive()?;
-            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Ge, rhs: add })
+            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Ge, rhs: add })
         }() {
             return Some(result);
         } else {
@@ -60,7 +104,7 @@ impl Parser {
             let lhs = self.comparison()?;
             self.expect("<=")?;
             let add = self.additive()?;
-            Some(Comparison::Comparison { lhs: Box::new(lhs), op: ComOp::Le, rhs: add })
+            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Le, rhs: add })
         }() {
             return Some(result);
         } else {
@@ -68,7 +112,7 @@ impl Parser {
         }
         if let Some(result) = || -> Option<Comparison> {
             let add = self.additive()?;
-            Some(Comparison::Additive(add))
+            Some(Comparison::Plain(add))
         }() {
             return Some(result);
         } else {
@@ -84,7 +128,7 @@ impl Parser {
             let lhs = self.additive()?;
             self.expect("+")?;
             let mul = self.multiplicity()?;
-            Some(Additive::Additive { lhs: Box::new(lhs), op: AddOp::Add, rhs: mul })
+            Some(Additive::Rec { lhs: Box::new(lhs), op: AddOp::Add, rhs: mul })
         }() {
             return Some(result);
         } else {
@@ -94,7 +138,7 @@ impl Parser {
             let lhs = self.additive()?;
             self.expect("-")?;
             let mul = self.multiplicity()?;
-            Some(Additive::Additive { lhs: Box::new(lhs), op: AddOp::Sub, rhs: mul })
+            Some(Additive::Rec { lhs: Box::new(lhs), op: AddOp::Sub, rhs: mul })
         }() {
             return Some(result);
         } else {
@@ -102,7 +146,7 @@ impl Parser {
         }
         if let Some(result) = || -> Option<Additive> {
             let mul = self.multiplicity()?;
-            Some(Additive::Multiplicity(mul))
+            Some(Additive::Plain(mul))
         }() {
             return Some(result);
         } else {
@@ -118,7 +162,7 @@ impl Parser {
             let lhs = self.multiplicity()?;
             self.expect("*")?;
             let unary = self.unary()?;
-            Some(Multiplicity::Multiplicity { lhs: Box::new(lhs), op: MulOp::Mul, rhs: unary })
+            Some(Multiplicity::Rec { lhs: Box::new(lhs), op: MulOp::Mul, rhs: unary })
         }() {
             return Some(result);
         } else {
@@ -128,7 +172,7 @@ impl Parser {
             let lhs = self.multiplicity()?;
             self.expect("/")?;
             let unary = self.unary()?;
-            Some(Multiplicity::Multiplicity { lhs: Box::new(lhs), op: MulOp::Div, rhs: unary })
+            Some(Multiplicity::Rec { lhs: Box::new(lhs), op: MulOp::Div, rhs: unary })
         }() {
             return Some(result);
         } else {
@@ -138,7 +182,7 @@ impl Parser {
             let lhs = self.multiplicity()?;
             self.expect("%")?;
             let unary = self.unary()?;
-            Some(Multiplicity::Multiplicity { lhs: Box::new(lhs), op: MulOp::Mod, rhs: unary })
+            Some(Multiplicity::Rec { lhs: Box::new(lhs), op: MulOp::Mod, rhs: unary })
         }() {
             return Some(result);
         } else {
@@ -146,7 +190,7 @@ impl Parser {
         }
         if let Some(result) = || -> Option<Multiplicity> {
             let unary = self.unary()?;
-            Some(Multiplicity::Unary(unary))
+            Some(Multiplicity::Plain(unary))
         }() {
             return Some(result);
         } else {
@@ -161,7 +205,7 @@ impl Parser {
         if let Some(result) = || -> Option<Unary> {
             self.expect("+")?;
             let unary = self.unary()?;
-            Some(Unary::Unary { op: UnaOp::Pos, inner: Box::new(unary) })
+            Some(Unary::Rec { op: UnaOp::Pos, inner: Box::new(unary) })
         }() {
             return Some(result);
         } else {
@@ -170,7 +214,16 @@ impl Parser {
         if let Some(result) = || -> Option<Unary> {
             self.expect("-")?;
             let unary = self.unary()?;
-            Some(Unary::Unary { op: UnaOp::Neg, inner: Box::new(unary) })
+            Some(Unary::Rec { op: UnaOp::Neg, inner: Box::new(unary) })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Unary> {
+            self.expect("not")?;
+            let unary = self.unary()?;
+            Some(Unary::Rec { op: UnaOp::Not, inner: Box::new(unary) })
         }() {
             return Some(result);
         } else {
@@ -178,7 +231,7 @@ impl Parser {
         }
         if let Some(result) = || -> Option<Unary> {
             let eval = self.evaluation()?;
-            Some(Unary::Evaluation(eval))
+            Some(Unary::Plain(eval))
         }() {
             return Some(result);
         } else {
@@ -229,6 +282,19 @@ impl Parser {
     #[lecursion(cache = Primary)]
     pub fn primary(&mut self) -> Option<Primary> {
         let pos = self.stream.mark();
+        let mut cut = false;
+        if let Some(result) = || -> Option<Primary> {
+            self.expect("(")?;
+            cut = true;
+            let expr = self.logical()?;
+            self.expect(")")?;
+            Some(Primary::Parentheses(Box::new(expr)))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if cut { return None; }
         if let Some(result) = || -> Option<Primary> {
             let boolean = self.boolean()?;
             Some(Primary::Boolean(boolean))

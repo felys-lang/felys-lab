@@ -1,15 +1,34 @@
 use pegmacro::CRInner;
 
-pub type Program = Comparison;
+pub type Program = Expression;
+
+pub type Expression = Logical;
+
+#[derive(Debug, Clone)]
+pub enum Logical {
+    Rec {
+        lhs: Box<Logical>,
+        op: LogOp,
+        rhs: Comparison,
+    },
+    Plain(Comparison)
+}
+
+#[derive(Debug, Clone)]
+pub enum LogOp {
+    And,
+    Xor,
+    Or
+}
 
 #[derive(Debug, Clone)]
 pub enum Comparison {
-    Comparison {
+    Rec {
         lhs: Box<Comparison>,
         op: ComOp,
         rhs: Additive,
     },
-    Additive(Additive),
+    Plain(Additive),
 }
 
 #[derive(Debug, Clone)]
@@ -24,12 +43,12 @@ pub enum ComOp {
 
 #[derive(Debug, Clone)]
 pub enum Additive {
-    Additive {
+    Rec {
         lhs: Box<Additive>,
         op: AddOp,
         rhs: Multiplicity,
     },
-    Multiplicity(Multiplicity),
+    Plain(Multiplicity),
 }
 
 #[derive(Debug, Clone)]
@@ -40,12 +59,12 @@ pub enum AddOp {
 
 #[derive(Debug, Clone)]
 pub enum Multiplicity {
-    Multiplicity {
+    Rec {
         lhs: Box<Multiplicity>,
         op: MulOp,
         rhs: Unary,
     },
-    Unary(Unary),
+    Plain(Unary),
 }
 
 #[derive(Debug, Clone)]
@@ -57,17 +76,18 @@ pub enum MulOp {
 
 #[derive(Debug, Clone)]
 pub enum Unary {
-    Unary {
+    Rec {
         op: UnaOp,
         inner: Box<Unary>,
     },
-    Evaluation(Evaluation),
+    Plain(Evaluation),
 }
 
 #[derive(Debug, Clone)]
 pub enum UnaOp {
     Pos,
     Neg,
+    Not,
 }
 
 #[derive(Debug, Clone)]
@@ -84,6 +104,7 @@ pub enum Evaluation {
 
 #[derive(Debug, Clone)]
 pub enum Primary {
+    Parentheses(Box<Expression>),
     Identifier(Namespace),
     Integer(Integer),
     Decimal(Decimal),
@@ -134,6 +155,7 @@ pub enum CacheType {
     Boolean,
     Decimal,
     Integer,
+    Logical,
     Unary,
     Name,
 }
@@ -150,6 +172,7 @@ pub enum CacheResult {
     Boolean(Option<Boolean>),
     Decimal(Option<Decimal>),
     Integer(Option<Integer>),
+    Logical(Option<Logical>),
     Unary(Option<Unary>),
     Name(Option<Name>),
 }
