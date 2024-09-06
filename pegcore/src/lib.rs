@@ -28,5 +28,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("std::lib::core::foo::bar-0".to_string())
+    parse("std::lib::core::foo::bar".to_string())
 }

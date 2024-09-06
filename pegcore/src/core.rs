@@ -110,6 +110,7 @@ impl Cache {
             self.hit += 1;
             Some(res.clone())
         } else {
+            println!("dne\t\t{:<15} {:?}", pos, ct);
             None
         }
     }

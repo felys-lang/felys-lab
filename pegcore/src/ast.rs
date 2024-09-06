@@ -1,4 +1,4 @@
-use pegmacro::Unwrap;
+use pegmacro::CRInner;
 
 pub struct Program(pub Namespace);
 
@@ -44,7 +44,7 @@ pub enum CacheType {
     Name,
 }
 
-#[derive(Debug, Clone, Unwrap)]
+#[derive(Debug, Clone, CRInner)]
 pub enum CacheResult {
     Expect(Option<&'static str>),
     Namespace(Option<Namespace>),

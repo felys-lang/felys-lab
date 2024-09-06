@@ -43,18 +43,18 @@ pub fn memoize(meta: TokenStream, body: TokenStream) -> TokenStream {
         }
     };
 
-    let cache = quote! {
-        let result = || #rt #block();
-        let __m_cache_result = crate::ast::CacheResult::#cache(result.clone());
+    let store = quote! {
+        let __m_result = || #rt #block();
+        let __m_cache_result = crate::ast::CacheResult::#cache(__m_result.clone());
         let __m_end = self.stream.mark();
         self.cache.insert(__m_pos, __m_cache_type, __m_end, __m_cache_result);
-        result
+        __m_result
     };
 
     let extended = quote! {
         #vis #signature {
             #fast
-            #cache
+            #store
         }
     };
 
@@ -62,7 +62,68 @@ pub fn memoize(meta: TokenStream, body: TokenStream) -> TokenStream {
 }
 
 
-#[proc_macro_derive(Unwrap)]
+#[proc_macro_attribute]
+pub fn lecursion(meta: TokenStream, body: TokenStream) -> TokenStream {
+    let meta = parse_macro_input!(meta as Meta);
+    let body = parse_macro_input!(body as ItemFn);
+
+    let signature = body.sig;
+    let rt = &signature.output;
+    let block = body.block;
+    let vis = body.vis;
+
+    let cache = match meta.require_name_value() {
+        Ok(MetaNameValue {
+               path,
+               value: Expr::Path(ident), ..
+           }) if path.is_ident("cache") => ident,
+        _ => panic!("cache argument is missing"),
+    };
+
+    let mut args = signature.inputs.iter()
+        .filter_map(|x| match x {
+            FnArg::Typed(PatType { pat, .. }) => Some(pat),
+            _ => None
+        })
+        .peekable();
+
+    let args = if args.peek().is_some() {
+        quote! { (#(#args),*) }
+    } else {
+        quote! {}
+    };
+
+    let body = quote! {
+        let __l_pos = self.stream.mark();
+        let __l_cache_type = crate::ast::CacheType::#cache #args;
+        let mut __l_cache_result = crate::ast::CacheResult::#cache(None);
+        let mut __l_end = __l_pos;
+        loop {
+            self.cache.insert(__l_pos, __l_cache_type, __l_end, __l_cache_result.clone());
+            let res = || #rt #block();
+            if __l_end < self.stream.mark() {
+                __l_cache_result = crate::ast::CacheResult::#cache(res);
+                __l_end = self.stream.mark();
+                self.stream.jump(__l_pos);
+            } else {
+                self.stream.jump(__l_end);
+                break __l_cache_result.into();
+            }
+        }
+    };
+
+    let extended = quote! {
+        #[pegmacro::memoize(cache = #cache)]
+        #vis #signature {
+            #body
+        }
+    };
+
+    extended.into()
+}
+
+
+#[proc_macro_derive(CRInner)]
 pub fn impl_cr_into_inner(body: TokenStream) -> TokenStream {
     let body = parse_macro_input!(body as DeriveInput);
 
