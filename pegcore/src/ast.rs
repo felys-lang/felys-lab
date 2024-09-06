@@ -61,21 +61,13 @@ pub enum Unary {
         op: UnaOp,
         inner: Box<Unary>,
     },
-    Primary(Primary),
+    Evaluation(Evaluation),
 }
 
 #[derive(Debug, Clone)]
 pub enum UnaOp {
     Pos,
     Neg,
-}
-
-#[derive(Debug, Clone)]
-pub enum Primary {
-    Evaluation(Evaluation),
-    Integer(Integer),
-    Decimal(Decimal),
-    Boolean(Boolean),
 }
 
 #[derive(Debug, Clone)]
@@ -87,7 +79,15 @@ pub enum Evaluation {
         ident: Box<Evaluation>,
         member: Name,
     },
-    Namespace(Namespace),
+    Primary(Primary),
+}
+
+#[derive(Debug, Clone)]
+pub enum Primary {
+    Identifier(Namespace),
+    Integer(Integer),
+    Decimal(Decimal),
+    Boolean(Boolean),
 }
 
 #[derive(Debug, Clone)]

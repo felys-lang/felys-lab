@@ -28,5 +28,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("0-0.0".to_string())
+    parse("11.11.to_string()".to_string())
 }

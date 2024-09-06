@@ -177,46 +177,8 @@ impl Parser {
             self.stream.jump(pos)
         }
         if let Some(result) = || -> Option<Unary> {
-            let primary = self.primary()?;
-            Some(Unary::Primary(primary))
-        }() {
-            return Some(result);
-        } else {
-            self.stream.jump(pos)
-        }
-        None
-    }
-
-    #[lecursion(cache = Primary)]
-    pub fn primary(&mut self) -> Option<Primary> {
-        let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Primary> {
-            let boolean = self.boolean()?;
-            Some(Primary::Boolean(boolean))
-        }() {
-            return Some(result);
-        } else {
-            self.stream.jump(pos)
-        }
-        if let Some(result) = || -> Option<Primary> {
             let eval = self.evaluation()?;
-            Some(Primary::Evaluation(eval))
-        }() {
-            return Some(result);
-        } else {
-            self.stream.jump(pos)
-        }
-        if let Some(result) = || -> Option<Primary> {
-            let decimal = self.decimal()?;
-            Some(Primary::Decimal(decimal))
-        }() {
-            return Some(result);
-        } else {
-            self.stream.jump(pos)
-        }
-        if let Some(result) = || -> Option<Primary> {
-            let integer = self.integer()?;
-            Some(Primary::Integer(integer))
+            Some(Unary::Evaluation(eval))
         }() {
             return Some(result);
         } else {
@@ -254,8 +216,46 @@ impl Parser {
         }
         if cut { return None; }
         if let Some(result) = || -> Option<Evaluation> {
+            let primary = self.primary()?;
+            Some(Evaluation::Primary(primary))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        None
+    }
+
+    #[lecursion(cache = Primary)]
+    pub fn primary(&mut self) -> Option<Primary> {
+        let pos = self.stream.mark();
+        if let Some(result) = || -> Option<Primary> {
+            let boolean = self.boolean()?;
+            Some(Primary::Boolean(boolean))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Primary> {
             let ns = self.namespace()?;
-            Some(Evaluation::Namespace(ns))
+            Some(Primary::Identifier(ns))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Primary> {
+            let decimal = self.decimal()?;
+            Some(Primary::Decimal(decimal))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Primary> {
+            let integer = self.integer()?;
+            Some(Primary::Integer(integer))
         }() {
             return Some(result);
         } else {
