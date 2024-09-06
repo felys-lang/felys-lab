@@ -7,7 +7,7 @@ mod extend;
 mod vb;
 
 pub fn parse(code: String) {
-    let mut parser = Parser::new(code, true);
+    let mut parser = Parser::new(code, Verbose::Core);
     if parser.program().is_none() {
         let leftover = parser.stream.collect::<String>();
         println!("leftover: \"{}\"", leftover);

@@ -76,7 +76,6 @@ impl Parser {
             self.lookahead(|c| !c.is_ascii_digit())?;
             Some(Integer::Base10("0".to_string()))
         }() {
-            println!("yes");
             return Some(body);
         } else {
             self.stream.jump(pos)

@@ -9,7 +9,7 @@ pub struct Parser {
 
 #[allow(dead_code)]
 impl Parser {
-    pub fn new(code: String, v: bool) -> Self {
+    pub fn new(code: String, v: Verbose) -> Self {
         Self {
             stream: Stream {
                 body: code,
@@ -85,32 +85,43 @@ impl Iterator for Stream {
 
 pub struct Cache {
     pub body: HashMap<(usize, CacheType), (usize, CacheResult)>,
-    pub verbose: bool,
+    pub verbose: Verbose,
     pub hit: usize,
+}
+
+#[allow(dead_code)]
+pub enum Verbose {
+    Full,
+    Core,
+    None
 }
 
 impl Cache {
     pub fn get(&mut self, pos: usize, ct: CacheType) -> Option<(usize, CacheResult)> {
         if let Some(res) = self.body.get(&(pos, ct)) {
-            if self.verbose {
+            if matches!(self.verbose, Verbose::Full | Verbose::Core) {
                 let (end, cr) = res;
-                println!("hit\t\t{:<7} {:<7} {:?} => {}", pos, end, ct, cr)
+                println!("> hit\t\t{:<11} {:<23} {:<11} {}", pos, format!("{:?}", ct), end, cr)
             }
             self.hit += 1;
             Some(res.clone())
         } else {
-            println!("dne\t\t{:<15} {:?}", pos, ct);
+            if matches!(self.verbose, Verbose::Full) {
+                println!("> dne\t\t{:<11} {:?}", pos, ct);
+            }
             None
         }
     }
 
     pub fn insert(&mut self, pos: usize, ct: CacheType, end: usize, cr: CacheResult) {
-        if self.verbose {
-            println!("cache\t{:<7} {:<7} {:?} => {}", pos, end, ct, cr)
+        if matches!(self.verbose, Verbose::Full | Verbose::Core) {
+            println!("> cache\t\t{:<11} {:<23} {:<11} {}", pos, format!("{:?}", ct), end, cr)
         }
         if let Some(cache) = self.body.insert((pos, ct), (end, cr)) {
             let (end, cr) = cache;
-            println!("drop\t{:<7} {:<7} {:?} => {}", pos, end, ct, cr)
+            if matches!(self.verbose, Verbose::Full | Verbose::Core) {
+                println!("> drop\t\t{:<11} {:<23} {:<11} {}", pos, format!("{:?}", ct), end, cr)
+            }
         }
     }
 }
