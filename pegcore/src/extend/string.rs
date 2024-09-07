@@ -74,7 +74,7 @@ impl Parser {
         let mut cut = false;
         if let Some(result) = || -> Option<ElyFmtChar> {
             self.expect("{{")?;
-            Some(ElyFmtChar::Plain(ElyChar::Plain('{')))
+            Some(ElyFmtChar::Open)
         }() {
             return Some(result);
         } else {
@@ -82,7 +82,7 @@ impl Parser {
         }
         if let Some(result) = || -> Option<ElyFmtChar> {
             self.expect("}}")?;
-            Some(ElyFmtChar::Plain(ElyChar::Plain('}')))
+            Some(ElyFmtChar::Close)
         }() {
             return Some(result);
         } else {

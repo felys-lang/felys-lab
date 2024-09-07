@@ -226,6 +226,8 @@ impl Display for ElyFmtChar {
         match self {
             ElyFmtChar::Placeholder(x) => write!(f, "{{ {} }}", x),
             ElyFmtChar::Plain(x) => write!(f, "{}", x),
+            ElyFmtChar::Close => write!(f, "}}"),
+            ElyFmtChar::Open => write!(f, "{{"),
         }
     }
 }

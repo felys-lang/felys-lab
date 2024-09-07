@@ -163,6 +163,8 @@ pub enum ElyString {
 pub enum ElyFmtChar {
     Placeholder(ElyExpression),
     Plain(ElyChar),
+    Close,
+    Open,
 }
 
 #[derive(Debug, Clone)]
