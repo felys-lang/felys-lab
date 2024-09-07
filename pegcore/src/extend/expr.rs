@@ -270,11 +270,12 @@ impl Parser {
         let pos = self.stream.mark();
         let mut cut = false;
         if let Some(result) = || -> Option<Evaluation> {
-            let pe = self.evaluation()?;
+            let e = self.evaluation()?;
             self.expect("(")?;
             cut = true;
+            let args = self.arguments()?;
             self.expect(")")?;
-            Some(Evaluation::Call { ident: Box::new(pe) })
+            Some(Evaluation::Call { ident: Box::new(e), args })
         }() {
             return Some(result);
         } else {
@@ -296,6 +297,27 @@ impl Parser {
         if let Some(result) = || -> Option<Evaluation> {
             let primary = self.primary()?;
             Some(Evaluation::Primary(primary))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        None
+    }
+    
+    pub fn arguments(&mut self) -> Option<Arguments> {
+        let pos = self.stream.mark();
+        if let Some(result) = || -> Option<Arguments> {
+            let first = match self.expression() {
+                Some(expr) => expr,
+                None => return Some(Vec::new())
+            };
+            let mut body = vec![first];
+            while self.expect(",").is_some() {
+                let expr = self.expression()?;
+                body.push(expr)
+            }
+            Some(body)
         }() {
             return Some(result);
         } else {

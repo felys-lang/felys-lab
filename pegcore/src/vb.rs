@@ -130,8 +130,15 @@ impl Display for Evaluation {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Evaluation::Call {
-                ident
-            } => write!(f, "{}()", ident),
+                ident,
+                args
+            } => {
+                let args = args.iter()
+                    .map(|x| x.to_string())
+                    .collect::<Vec<String>>()
+                    .join(", ");
+                write!(f, "{}({})", ident, args)
+            },
             Evaluation::Member {
                 ident,
                 member

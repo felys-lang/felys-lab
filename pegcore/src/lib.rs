@@ -33,5 +33,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("((5*3) > 10) and ((4+6) == 11)".to_string())
+    parse("a(1,2,3(s))".to_string())
 }

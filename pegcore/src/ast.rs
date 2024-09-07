@@ -96,10 +96,13 @@ pub enum UnaOp {
     Neg,
 }
 
+pub type Arguments = Vec<Expression>;
+
 #[derive(Debug, Clone)]
 pub enum Evaluation {
     Call {
         ident: Box<Evaluation>,
+        args: Arguments
     },
     Member {
         ident: Box<Evaluation>,
