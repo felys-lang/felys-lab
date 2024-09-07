@@ -99,6 +99,23 @@ impl Parser {
     #[memoize(cache = Decimal)]
     pub fn decimal(&mut self) -> Option<Decimal> {
         let pos = self.stream.mark();
+        let mut cut = false;
+        if let Some(body) = || -> Option<Decimal> {
+            self.expect("0")?;
+            cut = true;
+            self.expect(".")?;
+            let first = self.scan(|c| c.is_ascii_digit())?;
+            let mut frac = String::from(first);
+            while let Some(more) = self.scan(|c| c.is_ascii_digit()) {
+                frac.push(more)
+            }
+            Some(Decimal { whole: "0".to_string(), frac })
+        }() {
+            return Some(body);
+        } else {
+            self.stream.jump(pos)
+        }
+        if cut { return None; }
         if let Some(body) = || -> Option<Decimal> {
             let first = self.scan(|c| c.is_ascii_digit())?;
             let mut whole = String::from(first);
