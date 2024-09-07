@@ -20,7 +20,7 @@ pub fn parse(code: String) {
 
 impl Parser {
     fn program(&mut self) -> Option<Program> {
-        let body = self.logical()?;
+        let body = self.expression()?;
         let pos = self.stream.mark();
         if self.stream.next().is_none() {
             Some(body)
@@ -33,5 +33,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("(std::hello()+world).say()".to_string())
+    parse("not(a)andborcandnotd".to_string())
 }

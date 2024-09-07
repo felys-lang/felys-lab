@@ -1,25 +1,35 @@
 use crate::ast::*;
 use std::fmt::{Display, Formatter};
 
-impl Display for Logical {
+impl Display for Disjunction {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Logical::Rec {
+            Disjunction::Rec {
                 lhs,
-                op,
                 rhs
-            } => write!(f, "{} {} {}", lhs, op, rhs),
-            Logical::Plain(x) => write!(f, "{}", x)
+            } => write!(f, "{} or {}", lhs, rhs),
+            Disjunction::Plain(x) => write!(f, "{}", x)
         }
     }
 }
 
-impl Display for LogOp {
+impl Display for Conjunction {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            LogOp::And => write!(f, "and"),
-            LogOp::Xor => write!(f, "xor"),
-            LogOp::Or => write!(f, "or")
+            Conjunction::Rec {
+                lhs,
+                rhs
+            } => write!(f, "{} and {}", lhs, rhs),
+            Conjunction::Plain(x) => write!(f, "{}", x)
+        }
+    }
+}
+
+impl Display for Inversion {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Inversion::Rec(x) => write!(f, "not {}", x),
+            Inversion::Plain(x) => write!(f, "{}", x)
         }
     }
 }
@@ -112,7 +122,6 @@ impl Display for UnaOp {
         match self {
             UnaOp::Pos => write!(f, "+"),
             UnaOp::Neg => write!(f, "-"),
-            UnaOp::Not => write!(f, "not "),
         }
     }
 }

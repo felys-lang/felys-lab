@@ -2,23 +2,30 @@ use pegmacro::CR;
 
 pub type Program = Expression;
 
-pub type Expression = Logical;
+pub type Expression = Disjunction;
 
 #[derive(Debug, Clone)]
-pub enum Logical {
+pub enum Disjunction {
     Rec {
-        lhs: Box<Logical>,
-        op: LogOp,
-        rhs: Comparison,
+        lhs: Box<Disjunction>,
+        rhs: Conjunction
     },
-    Plain(Comparison)
+    Plain(Conjunction)
 }
 
 #[derive(Debug, Clone)]
-pub enum LogOp {
-    And,
-    Xor,
-    Or
+pub enum Conjunction {
+    Rec {
+        lhs: Box<Conjunction>,
+        rhs: Inversion
+    },
+    Plain(Inversion)
+}
+
+#[derive(Debug, Clone)]
+pub enum Inversion {
+    Rec(Box<Inversion>),
+    Plain(Comparison)
 }
 
 #[derive(Debug, Clone)]
@@ -87,7 +94,6 @@ pub enum Unary {
 pub enum UnaOp {
     Pos,
     Neg,
-    Not,
 }
 
 #[derive(Debug, Clone)]
@@ -147,6 +153,9 @@ pub enum Boolean {
 pub enum CacheType {
     Expect(&'static str),
     Multiplicity,
+    Disjunction,
+    Conjunction,
+    Inversion,
     Comparison,
     Evaluation,
     Namespace,
@@ -155,7 +164,6 @@ pub enum CacheType {
     Boolean,
     Decimal,
     Integer,
-    Logical,
     Unary,
     Name,
 }
@@ -166,13 +174,15 @@ pub enum CacheResult {
     Multiplicity(Option<Multiplicity>),
     Comparison(Option<Comparison>),
     Evaluation(Option<Evaluation>),
+    Disjunction(Option<Disjunction>),
+    Conjunction(Option<Conjunction>),
+    Inversion(Option<Inversion>),
     Namespace(Option<Namespace>),
     Additive(Option<Additive>),
     Primary(Option<Primary>),
     Boolean(Option<Boolean>),
     Decimal(Option<Decimal>),
     Integer(Option<Integer>),
-    Logical(Option<Logical>),
     Unary(Option<Unary>),
     Name(Option<Name>),
 }

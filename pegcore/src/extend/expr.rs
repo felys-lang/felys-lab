@@ -3,42 +3,73 @@ use crate::core::Parser;
 use pegmacro::{lecursion, memoize};
 
 impl Parser {
-    #[lecursion(cache = Logical)]
-    pub fn logical(&mut self) -> Option<Logical> {
+    pub fn expression(&mut self) ->  Option<Expression> {
+        self.disjunction()
+    }
+    
+    #[lecursion(cache = Disjunction)]
+    pub fn disjunction(&mut self) -> Option<Disjunction> {
         let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Logical> {
-            let lhs = self.logical()?;
-            self.expect("and")?;
-            let comp = self.comparison()?;
-            Some(Logical::Rec { lhs: Box::new(lhs), op: LogOp::And, rhs: comp })
-        }() {
-            return Some(result);
-        } else {
-            self.stream.jump(pos)
-        }
-        if let Some(result) = || -> Option<Logical> {
-            let lhs = self.logical()?;
-            self.expect("xor")?;
-            let comp = self.comparison()?;
-            Some(Logical::Rec { lhs: Box::new(lhs), op: LogOp::Xor, rhs: comp })
-        }() {
-            return Some(result);
-        } else {
-            self.stream.jump(pos)
-        }
-        if let Some(result) = || -> Option<Logical> {
-            let lhs = self.logical()?;
+        if let Some(result) = || -> Option<Disjunction> {
+            let lhs = self.disjunction()?;
             self.expect("or")?;
-            let comp = self.comparison()?;
-            Some(Logical::Rec { lhs: Box::new(lhs), op: LogOp::Or, rhs: comp })
+            let conj = self.conjunction()?;
+            Some(Disjunction::Rec{ lhs: Box::new(lhs), rhs: conj })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Logical> {
+        if let Some(result) = || -> Option<Disjunction> {
+            let conj = self.conjunction()?;
+            Some(Disjunction::Plain(conj))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        None
+    }
+    
+    #[lecursion(cache = Conjunction)]
+    pub fn conjunction(&mut self) -> Option<Conjunction> {
+        let pos = self.stream.mark();
+        if let Some(result) = || -> Option<Conjunction> {
+            let lhs = self.conjunction()?;
+            self.expect("and")?;
+            let inv = self.inversion()?;
+            Some(Conjunction::Rec{ lhs: Box::new(lhs), rhs: inv })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Conjunction> {
+            let inv = self.inversion()?;
+            Some(Conjunction::Plain(inv))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        None
+    }
+    
+    #[memoize(cache = Inversion)]
+    pub fn inversion(&mut self) -> Option<Inversion> {
+        let pos = self.stream.mark();
+        if let Some(result) = || -> Option<Inversion> {
+            self.expect("not")?;
+            let inv = self.inversion()?;
+            Some(Inversion::Rec(Box::new(inv)))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<Inversion> {
             let comp = self.comparison()?;
-            Some(Logical::Plain(comp))
+            Some(Inversion::Plain(comp))
         }() {
             return Some(result);
         } else {
@@ -221,15 +252,6 @@ impl Parser {
             self.stream.jump(pos)
         }
         if let Some(result) = || -> Option<Unary> {
-            self.expect("not")?;
-            let unary = self.unary()?;
-            Some(Unary::Rec { op: UnaOp::Not, inner: Box::new(unary) })
-        }() {
-            return Some(result);
-        } else {
-            self.stream.jump(pos)
-        }
-        if let Some(result) = || -> Option<Unary> {
             let eval = self.evaluation()?;
             Some(Unary::Plain(eval))
         }() {
@@ -286,7 +308,7 @@ impl Parser {
         if let Some(result) = || -> Option<Primary> {
             self.expect("(")?;
             cut = true;
-            let expr = self.logical()?;
+            let expr = self.expression()?;
             self.expect(")")?;
             Some(Primary::Parentheses(Box::new(expr)))
         }() {
