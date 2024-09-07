@@ -33,5 +33,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse(r#"hello(f"{ name }\t"+"12")# == false"#.to_string())
+    parse(r#"hello(f"{ name }\t"+"12") == false"#.to_string())
 }
