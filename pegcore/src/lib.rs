@@ -1,4 +1,4 @@
-use crate::ast::Program;
+use crate::ast::ElyProgram;
 use crate::core::*;
 
 mod ast;
@@ -19,7 +19,7 @@ pub fn parse(code: String) {
 }
 
 impl Parser {
-    fn program(&mut self) -> Option<Program> {
+    fn program(&mut self) -> Option<ElyProgram> {
         let body = self.expression()?;
         let pos = self.stream.mark();
         if self.stream.next().is_none() {

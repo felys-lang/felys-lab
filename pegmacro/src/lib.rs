@@ -35,9 +35,9 @@ pub fn memoize(meta: TokenStream, body: TokenStream) -> TokenStream {
 
     let fast = quote! {
         let __m_pos = self.stream.mark();
-        let __m_cache_type = crate::ast::CacheType::#cache #args;
-        if let Some(cache) = self.cache.get(__m_pos, __m_cache_type) {
-            let (__m_end, __m_cache_result) = cache;
+        let __m_cache_type = crate::ast::ElyCacheType::#cache #args;
+        if let Some(__m_cache) = self.cache.get(__m_pos, __m_cache_type) {
+            let (__m_end, __m_cache_result) = __m_cache;
             self.stream.jump(__m_end);
             return __m_cache_result.into()
         }
@@ -45,7 +45,7 @@ pub fn memoize(meta: TokenStream, body: TokenStream) -> TokenStream {
 
     let store = quote! {
         let __m_result = || #rt #block();
-        let __m_cache_result = crate::ast::CacheResult::#cache(__m_result.clone());
+        let __m_cache_result = crate::ast::ElyCacheResult::#cache(__m_result.clone());
         let __m_end = self.stream.mark();
         self.cache.insert(__m_pos, __m_cache_type, __m_end, __m_cache_result);
         __m_result
@@ -95,14 +95,14 @@ pub fn lecursion(meta: TokenStream, body: TokenStream) -> TokenStream {
 
     let body = quote! {
         let __l_pos = self.stream.mark();
-        let __l_cache_type = crate::ast::CacheType::#cache #args;
-        let mut __l_cache_result = crate::ast::CacheResult::#cache(None);
+        let __l_cache_type = crate::ast::ElyCacheType::#cache #args;
+        let mut __l_cache_result = crate::ast::ElyCacheResult::#cache(None);
         let mut __l_end = __l_pos;
         loop {
             self.cache.insert(__l_pos, __l_cache_type, __l_end, __l_cache_result.clone());
-            let res = || #rt #block();
+            let __l_res = || #rt #block();
             if __l_end < self.stream.mark() {
-                __l_cache_result = crate::ast::CacheResult::#cache(res);
+                __l_cache_result = crate::ast::ElyCacheResult::#cache(__l_res);
                 __l_end = self.stream.mark();
                 self.stream.jump(__l_pos);
             } else {
@@ -139,10 +139,10 @@ pub fn impl_cr_into_inner(body: TokenStream) -> TokenStream {
         };
         let cr = &x.ident;
         quote! {
-            impl From<crate::ast::CacheResult> for #inner {
-                fn from(value: crate::ast::CacheResult) -> Self {
+            impl From<crate::ast::ElyCacheResult> for #inner {
+                fn from(value: crate::ast::ElyCacheResult) -> Self {
                     match value {
-                        crate::ast::CacheResult::#cr(inner) => inner,
+                        crate::ast::ElyCacheResult::#cr(inner) => inner,
                         _ => panic!("cache unmatched")
                     }
                 }
@@ -153,7 +153,7 @@ pub fn impl_cr_into_inner(body: TokenStream) -> TokenStream {
     let display = variants.iter().map(|x| {
         let cr = &x.ident;
         quote! {
-            crate::ast::CacheResult::#cr(x) => match x {
+            crate::ast::ElyCacheResult::#cr(x) => match x {
                 Some(i) => write!(f, "{}", i),
                 None => write!(f, "None"),
             }
@@ -162,7 +162,7 @@ pub fn impl_cr_into_inner(body: TokenStream) -> TokenStream {
 
     let extended = quote! {
         #(#from)*
-        impl std::fmt::Display for crate::ast::CacheResult {
+        impl std::fmt::Display for crate::ast::ElyCacheResult {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 match self {
                     #(#display)*

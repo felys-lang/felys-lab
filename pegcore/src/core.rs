@@ -23,7 +23,7 @@ impl Parser {
         }
     }
 
-    #[memoize(cache = Expect)]
+    #[memoize(cache = ElyExpect)]
     pub fn expect(&mut self, s: &'static str) -> Option<&'static str> {
         let pos = self.stream.mark();
         for ch in s.chars() {
@@ -90,7 +90,7 @@ impl Iterator for Stream {
 }
 
 pub struct Cache {
-    pub body: HashMap<(usize, CacheType), (usize, CacheResult)>,
+    pub body: HashMap<(usize, ElyCacheType), (usize, ElyCacheResult)>,
     pub verbose: Verbose,
     pub hit: usize,
 }
@@ -104,7 +104,7 @@ pub enum Verbose {
 }
 
 impl Cache {
-    pub fn get(&mut self, pos: usize, ct: CacheType) -> Option<(usize, CacheResult)> {
+    pub fn get(&mut self, pos: usize, ct: ElyCacheType) -> Option<(usize, ElyCacheResult)> {
         if let Some(res) = self.body.get(&(pos, ct)) {
             if self.verbose >= Verbose::Core {
                 let (end, cr) = res;
@@ -120,7 +120,7 @@ impl Cache {
         }
     }
 
-    pub fn insert(&mut self, pos: usize, ct: CacheType, end: usize, cr: CacheResult) {
+    pub fn insert(&mut self, pos: usize, ct: ElyCacheType, end: usize, cr: ElyCacheResult) {
         if self.verbose >= Verbose::Core {
             println!("> cache\t\t{:<11} {:<23} {:<11} {}", pos, format!("{:?}", ct), end, cr)
         }

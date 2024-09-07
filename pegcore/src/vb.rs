@@ -1,135 +1,135 @@
 use crate::ast::*;
 use std::fmt::{Display, Formatter};
 
-impl Display for Disjunction {
+impl Display for ElyDisjunction {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Disjunction::Rec {
+            ElyDisjunction::Rec {
                 lhs,
                 rhs
             } => write!(f, "{} or {}", lhs, rhs),
-            Disjunction::Plain(x) => write!(f, "{}", x)
+            ElyDisjunction::Plain(x) => write!(f, "{}", x)
         }
     }
 }
 
-impl Display for Conjunction {
+impl Display for ElyConjunction {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Conjunction::Rec {
+            ElyConjunction::Rec {
                 lhs,
                 rhs
             } => write!(f, "{} and {}", lhs, rhs),
-            Conjunction::Plain(x) => write!(f, "{}", x)
+            ElyConjunction::Plain(x) => write!(f, "{}", x)
         }
     }
 }
 
-impl Display for Inversion {
+impl Display for ElyInversion {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Inversion::Rec(x) => write!(f, "not {}", x),
-            Inversion::Plain(x) => write!(f, "{}", x)
+            ElyInversion::Rec(x) => write!(f, "not {}", x),
+            ElyInversion::Plain(x) => write!(f, "{}", x)
         }
     }
 }
 
-impl Display for Comparison {
+impl Display for ElyComparison {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Comparison::Rec {
+            ElyComparison::Rec {
                 lhs,
                 op,
                 rhs
             } => write!(f, "{} {} {}", lhs, op, rhs),
-            Comparison::Plain(x) => write!(f, "{}", x)
+            ElyComparison::Plain(x) => write!(f, "{}", x)
         }
     }
 }
 
-impl Display for ComOp {
+impl Display for ElyComOp {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ComOp::Gt => write!(f, ">"),
-            ComOp::Ge => write!(f, ">="),
-            ComOp::Lt => write!(f, "<="),
-            ComOp::Le => write!(f, ">"),
-            ComOp::Eq => write!(f, "=="),
-            ComOp::Ne => write!(f, "!="),
+            ElyComOp::Gt => write!(f, ">"),
+            ElyComOp::Ge => write!(f, ">="),
+            ElyComOp::Lt => write!(f, "<="),
+            ElyComOp::Le => write!(f, ">"),
+            ElyComOp::Eq => write!(f, "=="),
+            ElyComOp::Ne => write!(f, "!="),
         }
     }
 }
 
-impl Display for Additive {
+impl Display for ElyAdditive {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Additive::Rec {
+            ElyAdditive::Rec {
                 lhs,
                 op,
                 rhs
             } => write!(f, "{} {} {}", lhs, op, rhs),
-            Additive::Plain(x) => write!(f, "{}", x)
+            ElyAdditive::Plain(x) => write!(f, "{}", x)
         }
     }
 }
 
-impl Display for AddOp {
+impl Display for ElyAddOp {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            AddOp::Add => write!(f, "+"),
-            AddOp::Sub => write!(f, "-"),
+            ElyAddOp::Add => write!(f, "+"),
+            ElyAddOp::Sub => write!(f, "-"),
         }
     }
 }
 
-impl Display for Multiplicity {
+impl Display for ElyMultiplicity {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Multiplicity::Rec {
+            ElyMultiplicity::Rec {
                 lhs,
                 op,
                 rhs
             } => write!(f, "{} {} {}", lhs, op, rhs),
-            Multiplicity::Plain(x) => write!(f, "{}", x)
+            ElyMultiplicity::Plain(x) => write!(f, "{}", x)
         }
     }
 }
 
-impl Display for MulOp {
+impl Display for ElyMulOp {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            MulOp::Mul => write!(f, "*"),
-            MulOp::Div => write!(f, "/"),
-            MulOp::Mod => write!(f, "%"),
+            ElyMulOp::Mul => write!(f, "*"),
+            ElyMulOp::Div => write!(f, "/"),
+            ElyMulOp::Mod => write!(f, "%"),
         }
     }
 }
 
-impl Display for Unary {
+impl Display for ElyUnary {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Unary::Rec {
+            ElyUnary::Rec {
                 op,
                 inner
             } => write!(f, "{}{}", op, inner),
-            Unary::Plain(x) => write!(f, "{}", x)
+            ElyUnary::Plain(x) => write!(f, "{}", x)
         }
     }
 }
 
-impl Display for UnaOp {
+impl Display for ElyUnaOp {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            UnaOp::Pos => write!(f, "+"),
-            UnaOp::Neg => write!(f, "-"),
+            ElyUnaOp::Pos => write!(f, "+"),
+            ElyUnaOp::Neg => write!(f, "-"),
         }
     }
 }
 
-impl Display for Evaluation {
+impl Display for ElyEvaluation {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Evaluation::Call {
+            ElyEvaluation::Call {
                 ident,
                 args
             } => {
@@ -139,61 +139,61 @@ impl Display for Evaluation {
                     .join(", ");
                 write!(f, "{}({})", ident, args)
             },
-            Evaluation::Member {
+            ElyEvaluation::Member {
                 ident,
                 member
             } => write!(f, "{}.{}", ident, member),
-            Evaluation::Primary(e) => write!(f, "{}", e)
+            ElyEvaluation::Primary(e) => write!(f, "{}", e)
         }
     }
 }
 
-impl Display for Primary {
+impl Display for ElyPrimary {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Primary::Parentheses(p) => write!(f, "({})", p),
-            Primary::Identifier(p) => write!(f, "{}", p),
-            Primary::Integer(p) => write!(f, "{}", p),
-            Primary::Decimal(p) => write!(f, "{}", p),
-            Primary::Boolean(p) => write!(f, "{}", p),
+            ElyPrimary::Parentheses(p) => write!(f, "({})", p),
+            ElyPrimary::Identifier(p) => write!(f, "{}", p),
+            ElyPrimary::Integer(p) => write!(f, "{}", p),
+            ElyPrimary::Decimal(p) => write!(f, "{}", p),
+            ElyPrimary::Boolean(p) => write!(f, "{}", p),
         }
     }
 }
 
-impl Display for Namespace {
+impl Display for ElyNamespace {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Namespace::Space {
+            ElyNamespace::Space {
                 ns,
                 name
             } => write!(f, "{}::{}", ns, name),
-            Namespace::Name(n) => write!(f, "{}", n)
+            ElyNamespace::Name(n) => write!(f, "{}", n)
         }
     }
 }
 
-impl Display for Integer {
+impl Display for ElyInteger {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Integer::Base16(i) => write!(f, "0x{}", i),
-            Integer::Base10(i) => write!(f, "{}", i),
-            Integer::Base8(i) => write!(f, "0o{}", i),
-            Integer::Base2(i) => write!(f, "0b{}", i),
+            ElyInteger::Base16(i) => write!(f, "0x{}", i),
+            ElyInteger::Base10(i) => write!(f, "{}", i),
+            ElyInteger::Base8(i) => write!(f, "0o{}", i),
+            ElyInteger::Base2(i) => write!(f, "0b{}", i),
         }
     }
 }
 
-impl Display for Decimal {
+impl Display for ElyDecimal {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}.{}", self.whole, self.frac)
     }
 }
 
-impl Display for Boolean {
+impl Display for ElyBoolean {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Boolean::True => write!(f, "true"),
-            Boolean::False => write!(f, "false")
+            ElyBoolean::True => write!(f, "true"),
+            ElyBoolean::False => write!(f, "false")
         }
     }
 }

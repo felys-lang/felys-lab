@@ -1,45 +1,45 @@
 use pegmacro::CR;
 
-pub type Program = Expression;
+pub type ElyProgram = ElyExpression;
 
-pub type Expression = Disjunction;
+pub type ElyExpression = ElyDisjunction;
 
 #[derive(Debug, Clone)]
-pub enum Disjunction {
+pub enum ElyDisjunction {
     Rec {
-        lhs: Box<Disjunction>,
-        rhs: Conjunction
+        lhs: Box<ElyDisjunction>,
+        rhs: ElyConjunction,
     },
-    Plain(Conjunction)
+    Plain(ElyConjunction),
 }
 
 #[derive(Debug, Clone)]
-pub enum Conjunction {
+pub enum ElyConjunction {
     Rec {
-        lhs: Box<Conjunction>,
-        rhs: Inversion
+        lhs: Box<ElyConjunction>,
+        rhs: ElyInversion,
     },
-    Plain(Inversion)
+    Plain(ElyInversion),
 }
 
 #[derive(Debug, Clone)]
-pub enum Inversion {
-    Rec(Box<Inversion>),
-    Plain(Comparison)
+pub enum ElyInversion {
+    Rec(Box<ElyInversion>),
+    Plain(ElyComparison),
 }
 
 #[derive(Debug, Clone)]
-pub enum Comparison {
+pub enum ElyComparison {
     Rec {
-        lhs: Box<Comparison>,
-        op: ComOp,
-        rhs: Additive,
+        lhs: Box<ElyComparison>,
+        op: ElyComOp,
+        rhs: ElyAdditive,
     },
-    Plain(Additive),
+    Plain(ElyAdditive),
 }
 
 #[derive(Debug, Clone)]
-pub enum ComOp {
+pub enum ElyComOp {
     Gt,
     Ge,
     Lt,
@@ -49,90 +49,90 @@ pub enum ComOp {
 }
 
 #[derive(Debug, Clone)]
-pub enum Additive {
+pub enum ElyAdditive {
     Rec {
-        lhs: Box<Additive>,
-        op: AddOp,
-        rhs: Multiplicity,
+        lhs: Box<ElyAdditive>,
+        op: ElyAddOp,
+        rhs: ElyMultiplicity,
     },
-    Plain(Multiplicity),
+    Plain(ElyMultiplicity),
 }
 
 #[derive(Debug, Clone)]
-pub enum AddOp {
+pub enum ElyAddOp {
     Add,
     Sub,
 }
 
 #[derive(Debug, Clone)]
-pub enum Multiplicity {
+pub enum ElyMultiplicity {
     Rec {
-        lhs: Box<Multiplicity>,
-        op: MulOp,
-        rhs: Unary,
+        lhs: Box<ElyMultiplicity>,
+        op: ElyMulOp,
+        rhs: ElyUnary,
     },
-    Plain(Unary),
+    Plain(ElyUnary),
 }
 
 #[derive(Debug, Clone)]
-pub enum MulOp {
+pub enum ElyMulOp {
     Mul,
     Div,
     Mod,
 }
 
 #[derive(Debug, Clone)]
-pub enum Unary {
+pub enum ElyUnary {
     Rec {
-        op: UnaOp,
-        inner: Box<Unary>,
+        op: ElyUnaOp,
+        inner: Box<ElyUnary>,
     },
-    Plain(Evaluation),
+    Plain(ElyEvaluation),
 }
 
 #[derive(Debug, Clone)]
-pub enum UnaOp {
+pub enum ElyUnaOp {
     Pos,
     Neg,
 }
 
-pub type Arguments = Vec<Expression>;
+pub type ElyArguments = Vec<ElyExpression>;
 
 #[derive(Debug, Clone)]
-pub enum Evaluation {
+pub enum ElyEvaluation {
     Call {
-        ident: Box<Evaluation>,
-        args: Arguments
+        ident: Box<ElyEvaluation>,
+        args: ElyArguments,
     },
     Member {
-        ident: Box<Evaluation>,
-        member: Name,
+        ident: Box<ElyEvaluation>,
+        member: ElyName,
     },
-    Primary(Primary),
+    Primary(ElyPrimary),
 }
 
 #[derive(Debug, Clone)]
-pub enum Primary {
-    Parentheses(Box<Expression>),
-    Identifier(Namespace),
-    Integer(Integer),
-    Decimal(Decimal),
-    Boolean(Boolean),
+pub enum ElyPrimary {
+    Parentheses(Box<ElyExpression>),
+    Identifier(ElyNamespace),
+    Integer(ElyInteger),
+    Decimal(ElyDecimal),
+    Boolean(ElyBoolean),
 }
 
 #[derive(Debug, Clone)]
-pub enum Namespace {
+pub enum ElyNamespace {
     Space {
-        ns: Box<Namespace>,
-        name: Name,
+        ns: Box<ElyNamespace>,
+        name: ElyName,
     },
-    Name(Name),
+    Name(ElyName),
 }
 
-pub type Name = String;
+pub type ElyName = String;
 
 #[derive(Debug, Clone)]
-pub enum Integer {
+pub enum ElyInteger {
     Base16(String),
     Base10(String),
     Base8(String),
@@ -140,52 +140,78 @@ pub enum Integer {
 }
 
 #[derive(Debug, Clone)]
-pub struct Decimal {
+pub struct ElyDecimal {
     pub whole: String,
     pub frac: String,
 }
 
 #[derive(Debug, Clone)]
-pub enum Boolean {
+pub enum ElyBoolean {
     True,
     False,
 }
 
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
-pub enum CacheType {
-    Expect(&'static str),
-    Multiplicity,
-    Disjunction,
-    Conjunction,
-    Inversion,
-    Comparison,
-    Evaluation,
-    Namespace,
-    Additive,
-    Primary,
-    Boolean,
-    Decimal,
-    Integer,
-    Unary,
-    Name,
+#[derive(Debug, Clone)]
+pub enum ElyString {
+    Format(Vec<ElyFmtChar>),
+    Plain(Vec<ElyChar>),
+    Raw(String),
 }
 
+#[derive(Debug, Clone)]
+pub enum ElyFmtChar {
+    Placeholder(ElyExpression),
+    Plain(ElyChar),
+}
+
+#[derive(Debug, Clone)]
+pub enum ElyChar {
+    Plain(char),
+    CarriageReturn,
+    SingleQuote,
+    DoubleQuote,
+    Backspace,
+    Backslash,
+    NewLine,
+    Tab,
+}
+
+#[allow(clippy::enum_variant_names)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+pub enum ElyCacheType {
+    ElyExpect(&'static str),
+    ElyMultiplicity,
+    ElyDisjunction,
+    ElyConjunction,
+    ElyInversion,
+    ElyComparison,
+    ElyEvaluation,
+    ElyNamespace,
+    ElyAdditive,
+    ElyPrimary,
+    ElyBoolean,
+    ElyDecimal,
+    ElyInteger,
+    ElyUnary,
+    ElyName,
+}
+
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone, CR)]
-pub enum CacheResult {
-    Expect(Option<&'static str>),
-    Multiplicity(Option<Multiplicity>),
-    Comparison(Option<Comparison>),
-    Evaluation(Option<Evaluation>),
-    Disjunction(Option<Disjunction>),
-    Conjunction(Option<Conjunction>),
-    Inversion(Option<Inversion>),
-    Namespace(Option<Namespace>),
-    Additive(Option<Additive>),
-    Primary(Option<Primary>),
-    Boolean(Option<Boolean>),
-    Decimal(Option<Decimal>),
-    Integer(Option<Integer>),
-    Unary(Option<Unary>),
-    Name(Option<Name>),
+pub enum ElyCacheResult {
+    ElyExpect(Option<&'static str>),
+    ElyMultiplicity(Option<ElyMultiplicity>),
+    ElyComparison(Option<ElyComparison>),
+    ElyEvaluation(Option<ElyEvaluation>),
+    ElyDisjunction(Option<ElyDisjunction>),
+    ElyConjunction(Option<ElyConjunction>),
+    ElyInversion(Option<ElyInversion>),
+    ElyNamespace(Option<ElyNamespace>),
+    ElyAdditive(Option<ElyAdditive>),
+    ElyPrimary(Option<ElyPrimary>),
+    ElyBoolean(Option<ElyBoolean>),
+    ElyDecimal(Option<ElyDecimal>),
+    ElyInteger(Option<ElyInteger>),
+    ElyUnary(Option<ElyUnary>),
+    ElyName(Option<ElyName>),
 }

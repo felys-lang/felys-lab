@@ -3,10 +3,10 @@ use crate::core::Parser;
 use pegmacro::memoize;
 
 impl Parser {
-    #[memoize(cache = Name)]
-    pub fn name(&mut self) -> Option<Name> {
+    #[memoize(cache = ElyName)]
+    pub fn name(&mut self) -> Option<ElyName> {
         let pos = self.stream.mark();
-        if let Some(body) = || -> Option<Name> {
+        if let Some(body) = || -> Option<ElyName> {
             let first = self.scan(|c| c.is_ascii_alphabetic() || c == '_')?;
             let mut body = String::from(first);
             while let Some(more) = self.scan(|c| c.is_ascii_alphanumeric() || c == '_') {
@@ -21,11 +21,11 @@ impl Parser {
         None
     }
 
-    #[memoize(cache = Integer)]
-    pub fn integer(&mut self) -> Option<Integer> {
+    #[memoize(cache = ElyInteger)]
+    pub fn integer(&mut self) -> Option<ElyInteger> {
         let pos = self.stream.mark();
         let mut cut = false;
-        if let Some(body) = || -> Option<Integer> {
+        if let Some(body) = || -> Option<ElyInteger> {
             self.expect("0x")?;
             cut = true;
             let first = self.scan(|c| c.is_ascii_hexdigit())?;
@@ -33,14 +33,14 @@ impl Parser {
             while let Some(more) = self.scan(|c| c.is_ascii_hexdigit()) {
                 body.push(more)
             }
-            Some(Integer::Base16(body))
+            Some(ElyInteger::Base16(body))
         }() {
             return Some(body);
         } else {
             self.stream.jump(pos)
         }
         if cut { return None; }
-        if let Some(body) = || -> Option<Integer> {
+        if let Some(body) = || -> Option<ElyInteger> {
             self.expect("0o")?;
             cut = true;
             let first = self.scan(|c| matches!(c, '0'..='7'))?;
@@ -48,14 +48,14 @@ impl Parser {
             while let Some(more) = self.scan(|c| matches!(c, '0'..='7')) {
                 body.push(more)
             }
-            Some(Integer::Base8(body))
+            Some(ElyInteger::Base8(body))
         }() {
             return Some(body);
         } else {
             self.stream.jump(pos)
         }
         if cut { return None; }
-        if let Some(body) = || -> Option<Integer> {
+        if let Some(body) = || -> Option<ElyInteger> {
             self.expect("0b")?;
             cut = true;
             let first = self.scan(|c| matches!(c, '0'|'1'))?;
@@ -63,31 +63,31 @@ impl Parser {
             while let Some(more) = self.scan(|c| matches!(c, '0'|'1')) {
                 body.push(more)
             }
-            Some(Integer::Base2(body))
+            Some(ElyInteger::Base2(body))
         }() {
             return Some(body);
         } else {
             self.stream.jump(pos)
         }
         if cut { return None; }
-        if let Some(body) = || -> Option<Integer> {
+        if let Some(body) = || -> Option<ElyInteger> {
             self.expect("0")?;
             cut = true;
             self.lookahead(|c| !c.is_ascii_digit())?;
-            Some(Integer::Base10("0".to_string()))
+            Some(ElyInteger::Base10("0".to_string()))
         }() {
             return Some(body);
         } else {
             self.stream.jump(pos)
         }
         if cut { return None; }
-        if let Some(body) = || -> Option<Integer> {
+        if let Some(body) = || -> Option<ElyInteger> {
             let first = self.scan(|c| c.is_ascii_digit())?;
             let mut body = String::from(first);
             while let Some(more) = self.scan(|c| c.is_ascii_digit()) {
                 body.push(more)
             }
-            Some(Integer::Base10(body))
+            Some(ElyInteger::Base10(body))
         }() {
             return Some(body);
         } else {
@@ -96,11 +96,11 @@ impl Parser {
         None
     }
 
-    #[memoize(cache = Decimal)]
-    pub fn decimal(&mut self) -> Option<Decimal> {
+    #[memoize(cache = ElyDecimal)]
+    pub fn decimal(&mut self) -> Option<ElyDecimal> {
         let pos = self.stream.mark();
         let mut cut = false;
-        if let Some(body) = || -> Option<Decimal> {
+        if let Some(body) = || -> Option<ElyDecimal> {
             self.expect("0")?;
             cut = true;
             self.expect(".")?;
@@ -109,14 +109,14 @@ impl Parser {
             while let Some(more) = self.scan(|c| c.is_ascii_digit()) {
                 frac.push(more)
             }
-            Some(Decimal { whole: "0".to_string(), frac })
+            Some(ElyDecimal { whole: "0".to_string(), frac })
         }() {
             return Some(body);
         } else {
             self.stream.jump(pos)
         }
         if cut { return None; }
-        if let Some(body) = || -> Option<Decimal> {
+        if let Some(body) = || -> Option<ElyDecimal> {
             let first = self.scan(|c| c.is_ascii_digit())?;
             let mut whole = String::from(first);
             while let Some(more) = self.scan(|c| c.is_ascii_digit()) {
@@ -128,7 +128,7 @@ impl Parser {
             while let Some(more) = self.scan(|c| c.is_ascii_digit()) {
                 frac.push(more)
             }
-            Some(Decimal { whole, frac })
+            Some(ElyDecimal { whole, frac })
         }() {
             return Some(body);
         } else {
@@ -137,20 +137,20 @@ impl Parser {
         None
     }
 
-    #[memoize(cache = Boolean)]
-    pub fn boolean(&mut self) -> Option<Boolean> {
+    #[memoize(cache = ElyBoolean)]
+    pub fn boolean(&mut self) -> Option<ElyBoolean> {
         let pos = self.stream.mark();
-        if let Some(body) = || -> Option<Boolean> {
+        if let Some(body) = || -> Option<ElyBoolean> {
             self.expect("true")?;
-            Some(Boolean::True)
+            Some(ElyBoolean::True)
         }() {
             return Some(body);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(body) = || -> Option<Boolean> {
+        if let Some(body) = || -> Option<ElyBoolean> {
             self.expect("false")?;
-            Some(Boolean::False)
+            Some(ElyBoolean::False)
         }() {
             return Some(body);
         } else {

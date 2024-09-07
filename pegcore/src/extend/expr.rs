@@ -3,27 +3,27 @@ use crate::core::Parser;
 use pegmacro::{lecursion, memoize};
 
 impl Parser {
-    pub fn expression(&mut self) ->  Option<Expression> {
+    pub fn expression(&mut self) ->  Option<ElyExpression> {
         self.disjunction()
     }
     
-    #[lecursion(cache = Disjunction)]
-    pub fn disjunction(&mut self) -> Option<Disjunction> {
+    #[lecursion(cache = ElyDisjunction)]
+    pub fn disjunction(&mut self) -> Option<ElyDisjunction> {
         let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Disjunction> {
+        if let Some(result) = || -> Option<ElyDisjunction> {
             let lhs = self.disjunction()?;
             self.expect("or")?;
             self.lookahead(|c| c.is_whitespace() || c=='(')?;
             let conj = self.conjunction()?;
-            Some(Disjunction::Rec{ lhs: Box::new(lhs), rhs: conj })
+            Some(ElyDisjunction::Rec{ lhs: Box::new(lhs), rhs: conj })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Disjunction> {
+        if let Some(result) = || -> Option<ElyDisjunction> {
             let conj = self.conjunction()?;
-            Some(Disjunction::Plain(conj))
+            Some(ElyDisjunction::Plain(conj))
         }() {
             return Some(result);
         } else {
@@ -32,23 +32,23 @@ impl Parser {
         None
     }
     
-    #[lecursion(cache = Conjunction)]
-    pub fn conjunction(&mut self) -> Option<Conjunction> {
+    #[lecursion(cache = ElyConjunction)]
+    pub fn conjunction(&mut self) -> Option<ElyConjunction> {
         let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Conjunction> {
+        if let Some(result) = || -> Option<ElyConjunction> {
             let lhs = self.conjunction()?;
             self.expect("and")?;
             self.lookahead(|c| c.is_whitespace() || c=='(')?;
             let inv = self.inversion()?;
-            Some(Conjunction::Rec{ lhs: Box::new(lhs), rhs: inv })
+            Some(ElyConjunction::Rec{ lhs: Box::new(lhs), rhs: inv })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Conjunction> {
+        if let Some(result) = || -> Option<ElyConjunction> {
             let inv = self.inversion()?;
-            Some(Conjunction::Plain(inv))
+            Some(ElyConjunction::Plain(inv))
         }() {
             return Some(result);
         } else {
@@ -57,22 +57,22 @@ impl Parser {
         None
     }
     
-    #[memoize(cache = Inversion)]
-    pub fn inversion(&mut self) -> Option<Inversion> {
+    #[memoize(cache = ElyInversion)]
+    pub fn inversion(&mut self) -> Option<ElyInversion> {
         let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Inversion> {
+        if let Some(result) = || -> Option<ElyInversion> {
             self.expect("not")?;
             self.lookahead(|c| c.is_whitespace() || c=='(')?;
             let inv = self.inversion()?;
-            Some(Inversion::Rec(Box::new(inv)))
+            Some(ElyInversion::Rec(Box::new(inv)))
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Inversion> {
+        if let Some(result) = || -> Option<ElyInversion> {
             let comp = self.comparison()?;
-            Some(Inversion::Plain(comp))
+            Some(ElyInversion::Plain(comp))
         }() {
             return Some(result);
         } else {
@@ -81,72 +81,72 @@ impl Parser {
         None
     }
 
-    #[lecursion(cache = Comparison)]
-    pub fn comparison(&mut self) -> Option<Comparison> {
+    #[lecursion(cache = ElyComparison)]
+    pub fn comparison(&mut self) -> Option<ElyComparison> {
         let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Comparison> {
+        if let Some(result) = || -> Option<ElyComparison> {
             let lhs = self.comparison()?;
             self.expect("==")?;
             let add = self.additive()?;
-            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Eq, rhs: add })
+            Some(ElyComparison::Rec { lhs: Box::new(lhs), op: ElyComOp::Eq, rhs: add })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Comparison> {
+        if let Some(result) = || -> Option<ElyComparison> {
             let lhs = self.comparison()?;
             self.expect("!=")?;
             let add = self.additive()?;
-            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Ne, rhs: add })
+            Some(ElyComparison::Rec { lhs: Box::new(lhs), op: ElyComOp::Ne, rhs: add })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Comparison> {
+        if let Some(result) = || -> Option<ElyComparison> {
             let lhs = self.comparison()?;
             self.expect(">")?;
             let add = self.additive()?;
-            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Gt, rhs: add })
+            Some(ElyComparison::Rec { lhs: Box::new(lhs), op: ElyComOp::Gt, rhs: add })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Comparison> {
+        if let Some(result) = || -> Option<ElyComparison> {
             let lhs = self.comparison()?;
             self.expect("<")?;
             let add = self.additive()?;
-            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Lt, rhs: add })
+            Some(ElyComparison::Rec { lhs: Box::new(lhs), op: ElyComOp::Lt, rhs: add })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Comparison> {
+        if let Some(result) = || -> Option<ElyComparison> {
             let lhs = self.comparison()?;
             self.expect(">=")?;
             let add = self.additive()?;
-            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Ge, rhs: add })
+            Some(ElyComparison::Rec { lhs: Box::new(lhs), op: ElyComOp::Ge, rhs: add })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Comparison> {
+        if let Some(result) = || -> Option<ElyComparison> {
             let lhs = self.comparison()?;
             self.expect("<=")?;
             let add = self.additive()?;
-            Some(Comparison::Rec { lhs: Box::new(lhs), op: ComOp::Le, rhs: add })
+            Some(ElyComparison::Rec { lhs: Box::new(lhs), op: ElyComOp::Le, rhs: add })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Comparison> {
+        if let Some(result) = || -> Option<ElyComparison> {
             let add = self.additive()?;
-            Some(Comparison::Plain(add))
+            Some(ElyComparison::Plain(add))
         }() {
             return Some(result);
         } else {
@@ -155,32 +155,32 @@ impl Parser {
         None
     }
 
-    #[lecursion(cache = Additive)]
-    pub fn additive(&mut self) -> Option<Additive> {
+    #[lecursion(cache = ElyAdditive)]
+    pub fn additive(&mut self) -> Option<ElyAdditive> {
         let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Additive> {
+        if let Some(result) = || -> Option<ElyAdditive> {
             let lhs = self.additive()?;
             self.expect("+")?;
             let mul = self.multiplicity()?;
-            Some(Additive::Rec { lhs: Box::new(lhs), op: AddOp::Add, rhs: mul })
+            Some(ElyAdditive::Rec { lhs: Box::new(lhs), op: ElyAddOp::Add, rhs: mul })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Additive> {
+        if let Some(result) = || -> Option<ElyAdditive> {
             let lhs = self.additive()?;
             self.expect("-")?;
             let mul = self.multiplicity()?;
-            Some(Additive::Rec { lhs: Box::new(lhs), op: AddOp::Sub, rhs: mul })
+            Some(ElyAdditive::Rec { lhs: Box::new(lhs), op: ElyAddOp::Sub, rhs: mul })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Additive> {
+        if let Some(result) = || -> Option<ElyAdditive> {
             let mul = self.multiplicity()?;
-            Some(Additive::Plain(mul))
+            Some(ElyAdditive::Plain(mul))
         }() {
             return Some(result);
         } else {
@@ -189,42 +189,42 @@ impl Parser {
         None
     }
 
-    #[lecursion(cache = Multiplicity)]
-    pub fn multiplicity(&mut self) -> Option<Multiplicity> {
+    #[lecursion(cache = ElyMultiplicity)]
+    pub fn multiplicity(&mut self) -> Option<ElyMultiplicity> {
         let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Multiplicity> {
+        if let Some(result) = || -> Option<ElyMultiplicity> {
             let lhs = self.multiplicity()?;
             self.expect("*")?;
             let unary = self.unary()?;
-            Some(Multiplicity::Rec { lhs: Box::new(lhs), op: MulOp::Mul, rhs: unary })
+            Some(ElyMultiplicity::Rec { lhs: Box::new(lhs), op: ElyMulOp::Mul, rhs: unary })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Multiplicity> {
+        if let Some(result) = || -> Option<ElyMultiplicity> {
             let lhs = self.multiplicity()?;
             self.expect("/")?;
             let unary = self.unary()?;
-            Some(Multiplicity::Rec { lhs: Box::new(lhs), op: MulOp::Div, rhs: unary })
+            Some(ElyMultiplicity::Rec { lhs: Box::new(lhs), op: ElyMulOp::Div, rhs: unary })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Multiplicity> {
+        if let Some(result) = || -> Option<ElyMultiplicity> {
             let lhs = self.multiplicity()?;
             self.expect("%")?;
             let unary = self.unary()?;
-            Some(Multiplicity::Rec { lhs: Box::new(lhs), op: MulOp::Mod, rhs: unary })
+            Some(ElyMultiplicity::Rec { lhs: Box::new(lhs), op: ElyMulOp::Mod, rhs: unary })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Multiplicity> {
+        if let Some(result) = || -> Option<ElyMultiplicity> {
             let unary = self.unary()?;
-            Some(Multiplicity::Plain(unary))
+            Some(ElyMultiplicity::Plain(unary))
         }() {
             return Some(result);
         } else {
@@ -233,30 +233,30 @@ impl Parser {
         None
     }
 
-    #[memoize(cache = Unary)]
-    pub fn unary(&mut self) -> Option<Unary> {
+    #[memoize(cache = ElyUnary)]
+    pub fn unary(&mut self) -> Option<ElyUnary> {
         let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Unary> {
+        if let Some(result) = || -> Option<ElyUnary> {
             self.expect("+")?;
             let unary = self.unary()?;
-            Some(Unary::Rec { op: UnaOp::Pos, inner: Box::new(unary) })
+            Some(ElyUnary::Rec { op: ElyUnaOp::Pos, inner: Box::new(unary) })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Unary> {
+        if let Some(result) = || -> Option<ElyUnary> {
             self.expect("-")?;
             let unary = self.unary()?;
-            Some(Unary::Rec { op: UnaOp::Neg, inner: Box::new(unary) })
+            Some(ElyUnary::Rec { op: ElyUnaOp::Neg, inner: Box::new(unary) })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Unary> {
+        if let Some(result) = || -> Option<ElyUnary> {
             let eval = self.evaluation()?;
-            Some(Unary::Plain(eval))
+            Some(ElyUnary::Plain(eval))
         }() {
             return Some(result);
         } else {
@@ -265,38 +265,38 @@ impl Parser {
         None
     }
 
-    #[lecursion(cache = Evaluation)]
-    pub fn evaluation(&mut self) -> Option<Evaluation> {
+    #[lecursion(cache = ElyEvaluation)]
+    pub fn evaluation(&mut self) -> Option<ElyEvaluation> {
         let pos = self.stream.mark();
         let mut cut = false;
-        if let Some(result) = || -> Option<Evaluation> {
+        if let Some(result) = || -> Option<ElyEvaluation> {
             let e = self.evaluation()?;
             self.expect("(")?;
             cut = true;
             let args = self.arguments()?;
             self.expect(")")?;
-            Some(Evaluation::Call { ident: Box::new(e), args })
+            Some(ElyEvaluation::Call { ident: Box::new(e), args })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
         if cut { return None; }
-        if let Some(result) = || -> Option<Evaluation> {
+        if let Some(result) = || -> Option<ElyEvaluation> {
             let pe = self.evaluation()?;
             self.expect(".")?;
             cut = true;
             let member = self.name()?;
-            Some(Evaluation::Member { ident: Box::new(pe), member })
+            Some(ElyEvaluation::Member { ident: Box::new(pe), member })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
         if cut { return None; }
-        if let Some(result) = || -> Option<Evaluation> {
+        if let Some(result) = || -> Option<ElyEvaluation> {
             let primary = self.primary()?;
-            Some(Evaluation::Primary(primary))
+            Some(ElyEvaluation::Primary(primary))
         }() {
             return Some(result);
         } else {
@@ -305,9 +305,9 @@ impl Parser {
         None
     }
     
-    pub fn arguments(&mut self) -> Option<Arguments> {
+    pub fn arguments(&mut self) -> Option<ElyArguments> {
         let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Arguments> {
+        if let Some(result) = || -> Option<ElyArguments> {
             let first = match self.expression() {
                 Some(expr) => expr,
                 None => return Some(Vec::new())
@@ -326,49 +326,49 @@ impl Parser {
         None
     }
 
-    #[lecursion(cache = Primary)]
-    pub fn primary(&mut self) -> Option<Primary> {
+    #[lecursion(cache = ElyPrimary)]
+    pub fn primary(&mut self) -> Option<ElyPrimary> {
         let pos = self.stream.mark();
         let mut cut = false;
-        if let Some(result) = || -> Option<Primary> {
+        if let Some(result) = || -> Option<ElyPrimary> {
             self.expect("(")?;
             cut = true;
             let expr = self.expression()?;
             self.expect(")")?;
-            Some(Primary::Parentheses(Box::new(expr)))
+            Some(ElyPrimary::Parentheses(Box::new(expr)))
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
         if cut { return None; }
-        if let Some(result) = || -> Option<Primary> {
+        if let Some(result) = || -> Option<ElyPrimary> {
             let boolean = self.boolean()?;
-            Some(Primary::Boolean(boolean))
+            Some(ElyPrimary::Boolean(boolean))
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Primary> {
+        if let Some(result) = || -> Option<ElyPrimary> {
             let ns = self.namespace()?;
-            Some(Primary::Identifier(ns))
+            Some(ElyPrimary::Identifier(ns))
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Primary> {
+        if let Some(result) = || -> Option<ElyPrimary> {
             let decimal = self.decimal()?;
-            Some(Primary::Decimal(decimal))
+            Some(ElyPrimary::Decimal(decimal))
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Primary> {
+        if let Some(result) = || -> Option<ElyPrimary> {
             let integer = self.integer()?;
-            Some(Primary::Integer(integer))
+            Some(ElyPrimary::Integer(integer))
         }() {
             return Some(result);
         } else {
@@ -377,22 +377,22 @@ impl Parser {
         None
     }
 
-    #[lecursion(cache = Namespace)]
-    pub fn namespace(&mut self) -> Option<Namespace> {
+    #[lecursion(cache = ElyNamespace)]
+    pub fn namespace(&mut self) -> Option<ElyNamespace> {
         let pos = self.stream.mark();
-        if let Some(result) = || -> Option<Namespace> {
+        if let Some(result) = || -> Option<ElyNamespace> {
             let ns = self.namespace()?;
             self.expect("::")?;
             let name = self.name()?;
-            Some(Namespace::Space { ns: Box::new(ns), name })
+            Some(ElyNamespace::Space { ns: Box::new(ns), name })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if let Some(result) = || -> Option<Namespace> {
+        if let Some(result) = || -> Option<ElyNamespace> {
             let name = self.name()?;
-            Some(Namespace::Name(name))
+            Some(ElyNamespace::Name(name))
         }() {
             return Some(result);
         } else {
