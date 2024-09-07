@@ -118,6 +118,7 @@ pub enum ElyPrimary {
     Integer(ElyInteger),
     Decimal(ElyDecimal),
     Boolean(ElyBoolean),
+    String(ElyString),
 }
 
 #[derive(Debug, Clone)]
@@ -167,12 +168,10 @@ pub enum ElyFmtChar {
 #[derive(Debug, Clone)]
 pub enum ElyChar {
     Plain(char),
-    CarriageReturn,
-    SingleQuote,
-    DoubleQuote,
-    Backspace,
     Backslash,
+    Quotation,
     NewLine,
+    Return,
     Tab,
 }
 
@@ -192,6 +191,7 @@ pub enum ElyCacheType {
     ElyBoolean,
     ElyDecimal,
     ElyInteger,
+    ElyString,
     ElyUnary,
     ElyName,
 }
@@ -212,6 +212,7 @@ pub enum ElyCacheResult {
     ElyBoolean(Option<ElyBoolean>),
     ElyDecimal(Option<ElyDecimal>),
     ElyInteger(Option<ElyInteger>),
+    ElyString(Option<ElyString>),
     ElyUnary(Option<ElyUnary>),
     ElyName(Option<ElyName>),
 }

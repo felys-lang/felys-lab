@@ -14,7 +14,7 @@ pub fn parse(code: String) {
     }
     if result.is_none() {
         let leftover = parser.stream.collect::<String>();
-        println!("leftover: \"{}\"", leftover);
+        println!("leftover: {}", leftover);
     }
 }
 
@@ -33,5 +33,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("a(1,2,3(s))".to_string())
+    parse(r#"hello(f"{ name }\t"+"12")# == false"#.to_string())
 }

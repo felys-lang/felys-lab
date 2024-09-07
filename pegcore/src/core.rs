@@ -13,7 +13,7 @@ impl Parser {
             stream: Stream {
                 body: code,
                 cursor: 0,
-                raw: false
+                raw: false,
             },
             cache: Cache {
                 body: HashMap::new(),
@@ -62,7 +62,7 @@ impl Parser {
 pub struct Stream {
     pub body: String,
     pub cursor: usize,
-    pub raw: bool
+    pub raw: bool,
 }
 
 impl Stream {

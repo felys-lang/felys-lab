@@ -93,7 +93,7 @@ pub fn lecursion(meta: TokenStream, body: TokenStream) -> TokenStream {
         quote! {}
     };
 
-    let body = quote! {
+    let main = quote! {
         let __l_pos = self.stream.mark();
         let __l_cache_type = crate::ast::ElyCacheType::#cache #args;
         let mut __l_cache_result = crate::ast::ElyCacheResult::#cache(None);
@@ -115,7 +115,7 @@ pub fn lecursion(meta: TokenStream, body: TokenStream) -> TokenStream {
     let extended = quote! {
         #[pegmacro::memoize(cache = #cache)]
         #vis #signature {
-            #body
+            #main
         }
     };
 

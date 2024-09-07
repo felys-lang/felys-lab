@@ -343,6 +343,14 @@ impl Parser {
         }
         if cut { return None; }
         if let Some(result) = || -> Option<ElyPrimary> {
+            let string = self.string()?;
+            Some(ElyPrimary::String(string))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<ElyPrimary> {
             let boolean = self.boolean()?;
             Some(ElyPrimary::Boolean(boolean))
         }() {

@@ -138,7 +138,7 @@ impl Display for ElyEvaluation {
                     .collect::<Vec<String>>()
                     .join(", ");
                 write!(f, "{}({})", ident, args)
-            },
+            }
             ElyEvaluation::Member {
                 ident,
                 member
@@ -151,11 +151,12 @@ impl Display for ElyEvaluation {
 impl Display for ElyPrimary {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ElyPrimary::Parentheses(p) => write!(f, "({})", p),
-            ElyPrimary::Identifier(p) => write!(f, "{}", p),
-            ElyPrimary::Integer(p) => write!(f, "{}", p),
-            ElyPrimary::Decimal(p) => write!(f, "{}", p),
-            ElyPrimary::Boolean(p) => write!(f, "{}", p),
+            ElyPrimary::Parentheses(x) => write!(f, "({})", x),
+            ElyPrimary::Identifier(x) => write!(f, "{}", x),
+            ElyPrimary::Integer(x) => write!(f, "{}", x),
+            ElyPrimary::Decimal(x) => write!(f, "{}", x),
+            ElyPrimary::Boolean(x) => write!(f, "{}", x),
+            ElyPrimary::String(x) => write!(f, "{}", x)
         }
     }
 }
@@ -194,6 +195,50 @@ impl Display for ElyBoolean {
         match self {
             ElyBoolean::True => write!(f, "true"),
             ElyBoolean::False => write!(f, "false")
+        }
+    }
+}
+
+impl Display for ElyString {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ElyString::Format(v) => {
+                let string = v.iter()
+                    .map(|x| x.to_string())
+                    .collect::<Vec<String>>()
+                    .join("");
+                write!(f, "f\"{}\"", string)
+            }
+            ElyString::Plain(v) => {
+                let string = v.iter()
+                    .map(|x| x.to_string())
+                    .collect::<Vec<String>>()
+                    .join("");
+                write!(f, "\"{}\"", string)
+            }
+            ElyString::Raw(x) => write!(f, "r\"{}\"", x)
+        }
+    }
+}
+
+impl Display for ElyFmtChar {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ElyFmtChar::Placeholder(x) => write!(f, "{{ {} }}", x),
+            ElyFmtChar::Plain(x) => write!(f, "{}", x),
+        }
+    }
+}
+
+impl Display for ElyChar {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ElyChar::Plain(x) => write!(f, "{}", x),
+            ElyChar::Return => write!(f, "\r"),
+            ElyChar::Quotation => write!(f, "\""),
+            ElyChar::Backslash => write!(f, "\\"),
+            ElyChar::NewLine => writeln!(f),
+            ElyChar::Tab => write!(f, "\t"),
         }
     }
 }
