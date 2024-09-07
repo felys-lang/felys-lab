@@ -33,5 +33,5 @@ impl Parser {
 
 #[test]
 fn test() {
-    parse("not(a)andborcandnotd".to_string())
+    parse("((5*3) > 10)and((4+6) == 11)".to_string())
 }

@@ -13,6 +13,7 @@ impl Parser {
             stream: Stream {
                 body: code,
                 cursor: 0,
+                raw: false
             },
             cache: Cache {
                 body: HashMap::new(),
@@ -47,9 +48,9 @@ impl Parser {
     }
 
     pub fn lookahead(&mut self, filter: fn(char) -> bool) -> Option<char> {
-        let pos = self.stream.mark();
-        let saw = self.stream.next().unwrap_or('\u{0}');
-        self.stream.jump(pos);
+        let saw = self.stream.body.chars()
+            .nth(self.stream.cursor)
+            .unwrap_or('\u{0}');
         if filter(saw) {
             Some(saw)
         } else {
@@ -61,6 +62,7 @@ impl Parser {
 pub struct Stream {
     pub body: String,
     pub cursor: usize,
+    pub raw: bool
 }
 
 impl Stream {
@@ -76,9 +78,14 @@ impl Stream {
 impl Iterator for Stream {
     type Item = char;
     fn next(&mut self) -> Option<Self::Item> {
-        let ch = self.body.chars().nth(self.cursor)?;
-        self.cursor += 1;
-        Some(ch)
+        let it = self.body.chars().skip(self.cursor);
+        for ch in it {
+            self.cursor += 1;
+            if self.raw || !ch.is_whitespace() {
+                return Some(ch);
+            }
+        }
+        None
     }
 }
 

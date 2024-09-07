@@ -13,6 +13,7 @@ impl Parser {
         if let Some(result) = || -> Option<Disjunction> {
             let lhs = self.disjunction()?;
             self.expect("or")?;
+            self.lookahead(|c| c.is_whitespace() || c=='(')?;
             let conj = self.conjunction()?;
             Some(Disjunction::Rec{ lhs: Box::new(lhs), rhs: conj })
         }() {
@@ -37,6 +38,7 @@ impl Parser {
         if let Some(result) = || -> Option<Conjunction> {
             let lhs = self.conjunction()?;
             self.expect("and")?;
+            self.lookahead(|c| c.is_whitespace() || c=='(')?;
             let inv = self.inversion()?;
             Some(Conjunction::Rec{ lhs: Box::new(lhs), rhs: inv })
         }() {
@@ -60,6 +62,7 @@ impl Parser {
         let pos = self.stream.mark();
         if let Some(result) = || -> Option<Inversion> {
             self.expect("not")?;
+            self.lookahead(|c| c.is_whitespace() || c=='(')?;
             let inv = self.inversion()?;
             Some(Inversion::Rec(Box::new(inv)))
         }() {
