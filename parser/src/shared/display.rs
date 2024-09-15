@@ -252,11 +252,11 @@ impl Display for ElyChar {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             ElyChar::Plain(x) => write!(f, "{}", x),
-            ElyChar::Return => write!(f, "\r"),
-            ElyChar::Quotation => write!(f, "\""),
-            ElyChar::Backslash => write!(f, "\\"),
-            ElyChar::NewLine => writeln!(f),
-            ElyChar::Tab => write!(f, "\t"),
+            ElyChar::Return => write!(f, "\\r"),
+            ElyChar::Quotation => write!(f, "\\\""),
+            ElyChar::Backslash => write!(f, "\\\\"),
+            ElyChar::NewLine => write!(f, "\\n"),
+            ElyChar::Tab => write!(f, "\\t"),
         }
     }
 }

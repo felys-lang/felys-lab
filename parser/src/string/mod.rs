@@ -18,3 +18,17 @@ where
     other.stream.jump(pos);
     Some(result)
 }
+
+#[test]
+fn test() {
+    let cases = [
+        (r#"  "el ysi\ta""#, r#""el ysi\ta""#),
+    ];
+
+    for (case, expect) in cases {
+        let mut x = Parser::<i32, i32>::new(case);
+        let result = parse(&mut x).unwrap().to_string();
+        assert_eq!(result.as_str(), expect);
+        assert_eq!(x.stream.mark(), case.len())
+    }
+}

@@ -50,6 +50,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
         if cut { return None; }
         if let Some(result) = || -> Option<ElyString> {
             self.expect("\"")?;
+            self.stream.strict(true);
             let mut string = Vec::new();
             while self.lookahead(|x| x != '"').is_some() {
                 let ch = self.ely_char()?;
@@ -114,6 +115,55 @@ impl Method for Parser<'_, CacheType, CacheResult> {
     }
 
     fn ely_char(&mut self) -> Option<ElyChar> {
-        todo!()
+        let pos = self.stream.mark();
+        if let Some(result) = || -> Option<ElyChar> {
+            let ch = self.scan(|c| !matches!(c, '\\' | '\n' | '\t' | 'r'))?;
+            Some(ElyChar::Plain(ch))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<ElyChar> {
+            self.expect("\\\\")?;
+            Some(ElyChar::Backslash)
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<ElyChar> {
+            self.expect("\\\"")?;
+            Some(ElyChar::Quotation)
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<ElyChar> {
+            self.expect("\\n")?;
+            Some(ElyChar::NewLine)
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<ElyChar> {
+            self.expect("\\r")?;
+            Some(ElyChar::Return)
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<ElyChar> {
+            self.expect("\\t")?;
+            Some(ElyChar::Tab)
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        None
     }
 }
