@@ -1,5 +1,5 @@
-use crate::shared::ast::{ElyChar, ElyFmtChar, ElyPlaceHolder, ElyString};
-use crate::string::registry::{Base, CacheResult, CacheType, Method};
+use crate::shared::ast::*;
+use crate::string::registry::*;
 use daybreak::Parser;
 
 impl Base for Parser<'_, CacheType, CacheResult> {

@@ -7,7 +7,7 @@ use std::hash::Hash;
 mod parser;
 mod registry;
 
-pub fn parse<CT, CR>(other: &mut Parser<CT, CR>) -> Option<ElyString>
+pub fn string<CT, CR>(other: &mut Parser<CT, CR>) -> Option<ElyString>
 where
     CT: Display + Debug + Hash + PartialEq + Eq + Clone + Copy,
     CR: Display + Debug + Clone,
