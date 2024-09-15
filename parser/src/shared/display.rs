@@ -241,7 +241,7 @@ impl Display for ElyPlaceHolder {
 impl Display for ElyAlign {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ElyAlign::Left => write!(f, "<"), 
+            ElyAlign::Left => write!(f, "<"),
             ElyAlign::Right => write!(f, ">"),
             ElyAlign::Middle => write!(f, "^"),
         }
