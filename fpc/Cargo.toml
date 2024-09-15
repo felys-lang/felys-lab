@@ -1,9 +1,0 @@
-[package]
-name = "fpc"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-prog = { path = "prog" }
-expr = { path = "expr" }
-string = { path = "string" }
