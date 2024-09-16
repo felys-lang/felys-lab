@@ -1,10 +1,6 @@
-use pegmacro::CR;
-
-pub type ElyProgram = ElyExpression;
-
 pub type ElyExpression = ElyDisjunction;
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyDisjunction {
     Rec {
         lhs: Box<ElyDisjunction>,
@@ -13,7 +9,7 @@ pub enum ElyDisjunction {
     Plain(ElyConjunction),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyConjunction {
     Rec {
         lhs: Box<ElyConjunction>,
@@ -22,13 +18,13 @@ pub enum ElyConjunction {
     Plain(ElyInversion),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyInversion {
     Rec(Box<ElyInversion>),
     Plain(ElyComparison),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyComparison {
     Rec {
         lhs: Box<ElyComparison>,
@@ -38,7 +34,7 @@ pub enum ElyComparison {
     Plain(ElyAdditive),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyComOp {
     Gt,
     Ge,
@@ -48,7 +44,7 @@ pub enum ElyComOp {
     Ne,
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyAdditive {
     Rec {
         lhs: Box<ElyAdditive>,
@@ -58,13 +54,13 @@ pub enum ElyAdditive {
     Plain(ElyMultiplicity),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyAddOp {
     Add,
     Sub,
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyMultiplicity {
     Rec {
         lhs: Box<ElyMultiplicity>,
@@ -74,14 +70,14 @@ pub enum ElyMultiplicity {
     Plain(ElyUnary),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyMulOp {
     Mul,
     Div,
     Mod,
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyUnary {
     Rec {
         op: ElyUnaOp,
@@ -90,7 +86,7 @@ pub enum ElyUnary {
     Plain(ElyEvaluation),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyUnaOp {
     Pos,
     Neg,
@@ -98,7 +94,7 @@ pub enum ElyUnaOp {
 
 pub type ElyArguments = Vec<ElyExpression>;
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyEvaluation {
     Call {
         ident: Box<ElyEvaluation>,
@@ -111,7 +107,7 @@ pub enum ElyEvaluation {
     Primary(ElyPrimary),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyPrimary {
     Parentheses(Box<ElyExpression>),
     Identifier(ElyNamespace),
@@ -121,7 +117,7 @@ pub enum ElyPrimary {
     String(ElyString),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyNamespace {
     Space {
         ns: Box<ElyNamespace>,
@@ -132,7 +128,7 @@ pub enum ElyNamespace {
 
 pub type ElyName = String;
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyInteger {
     Base16(String),
     Base10(String),
@@ -140,34 +136,51 @@ pub enum ElyInteger {
     Base2(String),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub struct ElyDecimal {
     pub whole: String,
     pub frac: String,
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyBoolean {
     True,
     False,
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyString {
     Format(Vec<ElyFmtChar>),
     Plain(Vec<ElyChar>),
     Raw(String),
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
 pub enum ElyFmtChar {
-    Placeholder(ElyExpression),
+    Placeholder {
+        expr: Option<ElyExpression>,
+        fmt: Option<ElyFormatter>,
+    },
     Plain(ElyChar),
     Close,
     Open,
 }
 
-#[derive(Debug, Clone)]
+#[daybreak::ast]
+pub struct ElyFormatter {
+    pub debug: bool,
+    pub align: Option<ElyAlign>,
+    pub len: Option<ElyInteger>,
+}
+
+#[daybreak::ast]
+pub enum ElyAlign {
+    Left,
+    Right,
+    Middle,
+}
+
+#[daybreak::ast]
 pub enum ElyChar {
     Plain(char),
     Backslash,
@@ -175,46 +188,4 @@ pub enum ElyChar {
     NewLine,
     Return,
     Tab,
-}
-
-#[allow(clippy::enum_variant_names)]
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
-pub enum ElyCacheType {
-    ElyExpect(&'static str),
-    ElyMultiplicity,
-    ElyDisjunction,
-    ElyConjunction,
-    ElyInversion,
-    ElyComparison,
-    ElyEvaluation,
-    ElyNamespace,
-    ElyAdditive,
-    ElyPrimary,
-    ElyBoolean,
-    ElyDecimal,
-    ElyInteger,
-    ElyString,
-    ElyUnary,
-    ElyName,
-}
-
-#[allow(clippy::enum_variant_names)]
-#[derive(Debug, Clone, CR)]
-pub enum ElyCacheResult {
-    ElyExpect(Option<&'static str>),
-    ElyMultiplicity(Option<ElyMultiplicity>),
-    ElyComparison(Option<ElyComparison>),
-    ElyEvaluation(Option<ElyEvaluation>),
-    ElyDisjunction(Option<ElyDisjunction>),
-    ElyConjunction(Option<ElyConjunction>),
-    ElyInversion(Option<ElyInversion>),
-    ElyNamespace(Option<ElyNamespace>),
-    ElyAdditive(Option<ElyAdditive>),
-    ElyPrimary(Option<ElyPrimary>),
-    ElyBoolean(Option<ElyBoolean>),
-    ElyDecimal(Option<ElyDecimal>),
-    ElyInteger(Option<ElyInteger>),
-    ElyString(Option<ElyString>),
-    ElyUnary(Option<ElyUnary>),
-    ElyName(Option<ElyName>),
 }

@@ -1,4 +1,4 @@
-use crate::ast::*;
+use crate::shared::ast::*;
 use std::fmt::{Display, Formatter};
 
 impl Display for ElyDisjunction {
@@ -224,10 +224,44 @@ impl Display for ElyString {
 impl Display for ElyFmtChar {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ElyFmtChar::Placeholder(x) => write!(f, "{{ {} }}", x),
+            ElyFmtChar::Placeholder {
+                expr,
+                fmt,
+            } => match (&expr, &fmt) {
+                (Some(ex), Some(fm)) => write!(f, "{{ {} : {} }}", ex, fm),
+                (_, Some(fm)) => write!(f, "{{:{}}}", fm),
+                (Some(ex), _) => write!(f, "{{ {} }}", ex),
+                _ => write!(f, "{{}}"),
+            },
             ElyFmtChar::Plain(x) => write!(f, "{}", x),
             ElyFmtChar::Close => write!(f, "}}"),
             ElyFmtChar::Open => write!(f, "{{"),
+        }
+    }
+}
+
+impl Display for ElyFormatter {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut result = Vec::new();
+        if self.debug {
+            result.push("?".to_string())
+        }
+        if let Some(x) = &self.align {
+            result.push(x.to_string())
+        }
+        if let Some(x) = &self.len {
+            result.push(x.to_string())
+        }
+        write!(f, "{}", result.join(""))
+    }
+}
+
+impl Display for ElyAlign {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ElyAlign::Left => write!(f, "<"),
+            ElyAlign::Right => write!(f, ">"),
+            ElyAlign::Middle => write!(f, "^"),
         }
     }
 }
@@ -236,11 +270,11 @@ impl Display for ElyChar {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             ElyChar::Plain(x) => write!(f, "{}", x),
-            ElyChar::Return => write!(f, "\r"),
-            ElyChar::Quotation => write!(f, "\""),
-            ElyChar::Backslash => write!(f, "\\"),
-            ElyChar::NewLine => writeln!(f),
-            ElyChar::Tab => write!(f, "\t"),
+            ElyChar::Return => write!(f, "\\r"),
+            ElyChar::Quotation => write!(f, "\\\""),
+            ElyChar::Backslash => write!(f, "\\\\"),
+            ElyChar::NewLine => write!(f, "\\n"),
+            ElyChar::Tab => write!(f, "\\t"),
         }
     }
 }
