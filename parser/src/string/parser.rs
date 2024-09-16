@@ -168,7 +168,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
     fn ely_char(&mut self) -> Option<ElyChar> {
         let pos = self.stream.mark();
         if let Some(result) = || -> Option<ElyChar> {
-            let ch = self.scan(|c| !matches!(c, '\\' | '\n' | '\t' | 'r'))?;
+            let ch = self.scan(|c| !matches!(c, '\\' | '\n' | '\t' | '\r'))?;
             Some(ElyChar::Plain(ch))
         }() {
             return Some(result);
