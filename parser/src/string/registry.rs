@@ -1,7 +1,7 @@
 use crate::shared::ast::*;
 
 #[daybreak::ct]
-pub struct  CacheType;
+pub struct CacheType;
 
 #[daybreak::cr]
 pub struct CacheResult;

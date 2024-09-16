@@ -156,7 +156,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
         }
         None
     }
-    
+
     fn ely_expression(&mut self) -> Option<ElyExpression> {
         expr::expr(self)
     }

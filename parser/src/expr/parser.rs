@@ -12,7 +12,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
     fn ely_expression(&mut self) -> Option<ElyExpression> {
         self.ely_disjunction()
     }
-    
+
     #[daybreak::lecursion(ElyDisjunction)]
     fn ely_disjunction(&mut self) -> Option<ElyDisjunction> {
         let pos = self.stream.mark();
@@ -20,7 +20,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
             let lhs = self.ely_disjunction()?;
             self.ely_keyword("or")?;
             let conj = self.ely_conjunction()?;
-            Some(ElyDisjunction::Rec{ lhs: Box::new(lhs), rhs: conj })
+            Some(ElyDisjunction::Rec { lhs: Box::new(lhs), rhs: conj })
         }() {
             return Some(result);
         } else {
@@ -44,7 +44,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
             let lhs = self.ely_conjunction()?;
             self.ely_keyword("and")?;
             let inv = self.ely_inversion()?;
-            Some(ElyConjunction::Rec{ lhs: Box::new(lhs), rhs: inv })
+            Some(ElyConjunction::Rec { lhs: Box::new(lhs), rhs: inv })
         }() {
             return Some(result);
         } else {
