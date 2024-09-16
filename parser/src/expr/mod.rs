@@ -1,6 +1,6 @@
 use crate::expr::registry::Method;
 use crate::shared::ast::{ElyExpression, ElyInteger};
-use daybreak::Parser;
+use daybreak::{Parser, Verbose};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
@@ -34,5 +34,8 @@ where
 
 #[test]
 fn test() {
-    expr(&mut Parser::<i32, i32>::new(r#" f"123{:<9}".format("hi") "#));
+    let code = r#" 1 and 2 "#;
+    let mut x = Parser::<i32, i32>::new(code);
+    x.v(Verbose::Core);
+    println!("{}", expr(&mut x).unwrap())
 }
