@@ -34,5 +34,5 @@ where
 
 #[test]
 fn test() {
-    expr(&mut Parser::<i32, i32>::new(r#" f"123{:9<}" "#));
+    expr(&mut Parser::<i32, i32>::new(r#" f"123{:<9}".format("hi") "#));
 }

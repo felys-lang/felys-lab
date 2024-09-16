@@ -228,9 +228,9 @@ impl Display for ElyFmtChar {
                 expr,
                 fmt,
             } => match (&expr, &fmt) {
-                (Some(ex), Some(fm)) => write!(f, "{} {}", ex, fm),
-                (_, Some(fm)) => write!(f, "{}", fm),
-                (Some(ex), _) => write!(f, "{}", ex),
+                (Some(ex), Some(fm)) => write!(f, "{{ {} : {} }}", ex, fm),
+                (_, Some(fm)) => write!(f, "{{:{}}}", fm),
+                (Some(ex), _) => write!(f, "{{ {} }}", ex),
                 _ => write!(f, "{{}}"),
             },
             ElyFmtChar::Plain(x) => write!(f, "{}", x),
@@ -252,7 +252,7 @@ impl Display for ElyFormatter {
         if let Some(x) = &self.len {
             result.push(x.to_string())
         }
-        write!(f, ": {}", result.join(""))
+        write!(f, "{}", result.join(""))
     }
 }
 

@@ -70,7 +70,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
     #[daybreak::strict]
     fn ely_fmt_char(&mut self) -> Option<ElyFmtChar> {
         let pos = self.stream.mark();
-        let mode = self.stream.mode();
+        let mut cut = false;
         if let Some(result) = || -> Option<ElyFmtChar> {
             self.expect("{{")?;
             Some(ElyFmtChar::Open)
@@ -90,6 +90,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
         if let Some(result) = || -> Option<ElyFmtChar> {
             self.expect("{")?;
             self.stream.strict(false);
+            cut = true;
             let expr = self.ely_expression();
             let fmt = self.ely_formatter();
             self.expect("}")?;
@@ -99,7 +100,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
         } else {
             self.stream.jump(pos)
         }
-        self.stream.strict(mode);
+        if cut { return None; }
         if let Some(result) = || -> Option<ElyFmtChar> {
             let ch = self.ely_char()?;
             Some(ElyFmtChar::Plain(ch))
@@ -147,7 +148,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
             let debug = self.expect("?").is_some();
             let align = self.ely_align();
             let len = self.ely_integer();
-            Some(ElyFormatter{ debug, align, len, })
+            Some(ElyFormatter { debug, align, len })
         }() {
             return Some(result);
         } else {
