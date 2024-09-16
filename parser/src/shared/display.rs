@@ -224,7 +224,15 @@ impl Display for ElyString {
 impl Display for ElyFmtChar {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ElyFmtChar::Placeholder(x) => write!(f, "{{ {} }}", x),
+            ElyFmtChar::Placeholder {
+                expr,
+                fmt,
+            } => match (&expr, &fmt) {
+                (Some(ex), Some(fm)) => write!(f, "{} {}", ex, fm),
+                (_, Some(fm)) => write!(f, "{}", fm),
+                (Some(ex), _) => write!(f, "{}", ex),
+                _ => write!(f, "{{}}"),
+            },
             ElyFmtChar::Plain(x) => write!(f, "{}", x),
             ElyFmtChar::Close => write!(f, "}}"),
             ElyFmtChar::Open => write!(f, "{{"),
@@ -232,9 +240,19 @@ impl Display for ElyFmtChar {
     }
 }
 
-impl Display for ElyPlaceHolder {
+impl Display for ElyFormatter {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} : {} {}", self.expr, self.align, self.len)
+        let mut result = Vec::new();
+        if self.debug {
+            result.push("?".to_string())
+        }
+        if let Some(x) = &self.align {
+            result.push(x.to_string())
+        }
+        if let Some(x) = &self.len {
+            result.push(x.to_string())
+        }
+        write!(f, ": {}", result.join(""))
     }
 }
 

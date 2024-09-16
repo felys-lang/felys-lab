@@ -157,17 +157,20 @@ pub enum ElyString {
 
 #[daybreak::ast]
 pub enum ElyFmtChar {
-    Placeholder(ElyPlaceHolder),
+    Placeholder {
+        expr: Option<ElyExpression>,
+        fmt: Option<ElyFormatter>,
+    },
     Plain(ElyChar),
     Close,
     Open,
 }
 
 #[daybreak::ast]
-pub struct ElyPlaceHolder {
-    pub expr: ElyExpression,
-    pub align: ElyAlign,
-    pub len: ElyInteger,
+pub struct ElyFormatter {
+    pub debug: bool,
+    pub align: Option<ElyAlign>,
+    pub len: Option<ElyInteger>,
 }
 
 #[daybreak::ast]

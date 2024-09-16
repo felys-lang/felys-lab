@@ -1,3 +1,4 @@
+use crate::expr;
 use crate::shared::ast::*;
 use crate::string::registry::*;
 use daybreak::Parser;
@@ -69,7 +70,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
     #[daybreak::strict]
     fn ely_fmt_char(&mut self) -> Option<ElyFmtChar> {
         let pos = self.stream.mark();
-        let mut cut = false;
+        let mode = self.stream.mode();
         if let Some(result) = || -> Option<ElyFmtChar> {
             self.expect("{{")?;
             Some(ElyFmtChar::Open)
@@ -89,16 +90,16 @@ impl Method for Parser<'_, CacheType, CacheResult> {
         if let Some(result) = || -> Option<ElyFmtChar> {
             self.expect("{")?;
             self.stream.strict(false);
-            cut = true;
-            let placeholder = self.ely_placeholder()?;
+            let expr = self.ely_expression();
+            let fmt = self.ely_formatter();
             self.expect("}")?;
-            Some(ElyFmtChar::Placeholder(placeholder))
+            Some(ElyFmtChar::Placeholder { expr, fmt })
         }() {
             return Some(result);
         } else {
             self.stream.jump(pos)
         }
-        if cut { return None; }
+        self.stream.strict(mode);
         if let Some(result) = || -> Option<ElyFmtChar> {
             let ch = self.ely_char()?;
             Some(ElyFmtChar::Plain(ch))
@@ -110,8 +111,58 @@ impl Method for Parser<'_, CacheType, CacheResult> {
         None
     }
 
-    fn ely_placeholder(&mut self) -> Option<ElyPlaceHolder> {
-        todo!()
+    fn ely_align(&mut self) -> Option<ElyAlign> {
+        let pos = self.stream.mark();
+        if let Some(result) = || -> Option<ElyAlign> {
+            self.expect("<")?;
+            Some(ElyAlign::Left)
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<ElyAlign> {
+            self.expect(">")?;
+            Some(ElyAlign::Right)
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if let Some(result) = || -> Option<ElyAlign> {
+            self.expect("^")?;
+            Some(ElyAlign::Middle)
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        None
+    }
+
+    fn ely_formatter(&mut self) -> Option<ElyFormatter> {
+        let pos = self.stream.mark();
+        if let Some(result) = || -> Option<ElyFormatter> {
+            self.expect(":")?;
+            let debug = self.expect("?").is_some();
+            let align = self.ely_align();
+            let len = self.ely_integer();
+            Some(ElyFormatter{ debug, align, len, })
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        None
+    }
+
+    #[daybreak::memoize(ElyExpression)]
+    fn ely_expression(&mut self) -> Option<ElyExpression> {
+        expr::expr(self)
+    }
+
+    fn ely_integer(&mut self) -> Option<ElyInteger> {
+        expr::integer(self)
     }
 
     fn ely_char(&mut self) -> Option<ElyChar> {

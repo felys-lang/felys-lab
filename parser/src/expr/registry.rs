@@ -2,7 +2,6 @@ use crate::shared::ast::*;
 
 #[daybreak::ct]
 pub enum CacheType {
-    ElyExpect(&'static str),
     ElyMultiplicity,
     ElyDisjunction,
     ElyConjunction,
@@ -22,7 +21,6 @@ pub enum CacheType {
 
 #[daybreak::cr]
 pub enum CacheResult {
-    ElyExpect(Option<&'static str>),
     ElyMultiplicity(Option<ElyMultiplicity>),
     ElyComparison(Option<ElyComparison>),
     ElyEvaluation(Option<ElyEvaluation>),
@@ -50,6 +48,7 @@ pub trait Method: Base {
     fn ely_disjunction(&mut self) -> Option<ElyDisjunction>;
     fn ely_conjunction(&mut self) -> Option<ElyConjunction>;
     fn ely_inversion(&mut self) -> Option<ElyInversion>;
+    fn ely_keyword(&mut self, s: &'static str) -> Option<&'static str>;
     fn ely_comparison(&mut self) -> Option<ElyComparison>;
     fn ely_additive(&mut self) -> Option<ElyAdditive>;
     fn ely_multiplicity(&mut self) -> Option<ElyMultiplicity>;
@@ -62,5 +61,5 @@ pub trait Method: Base {
     fn ely_integer(&mut self) -> Option<ElyInteger>;
     fn ely_decimal(&mut self) -> Option<ElyDecimal>;
     fn ely_boolean(&mut self) -> Option<ElyBoolean>;
-    fn ely_expect(&mut self, s: &'static str) -> Option<&'static str>;
+    fn ely_string(&mut self) -> Option<ElyString>;
 }
