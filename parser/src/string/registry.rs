@@ -1,14 +1,10 @@
 use crate::shared::ast::*;
 
 #[daybreak::ct]
-pub enum CacheType {
-    ElyExpression
-}
+pub struct  CacheType;
 
 #[daybreak::cr]
-pub enum CacheResult {
-    ElyExpression(Option<ElyExpression>)
-}
+pub struct CacheResult;
 
 pub trait Base {
     type CT;

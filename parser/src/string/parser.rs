@@ -156,8 +156,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
         }
         None
     }
-
-    #[daybreak::memoize(ElyExpression)]
+    
     fn ely_expression(&mut self) -> Option<ElyExpression> {
         expr::expr(self)
     }
