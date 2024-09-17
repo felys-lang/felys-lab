@@ -8,7 +8,7 @@ Unlike the full-stack version of current Felys, the future version will have a f
 
 ### Front-end
 
-I am familiar with PEG, which is powerful enough, so I will stick with it.
+I am familiar with PEG, which is powerful enough, so I will stick with it. See [parser](parser) for expression implementation. It is a handwritten mapping from the grammar file with cache level optimization only.
 
 ### Back-end
 
