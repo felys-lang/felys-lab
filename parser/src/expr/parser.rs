@@ -576,7 +576,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
     fn ely_boolean(&mut self) -> Option<ElyBoolean> {
         let pos = self.stream.mark();
         if let Some(body) = || -> Option<ElyBoolean> {
-            self.expect("true")?;
+            self.ely_keyword("true")?;
             Some(ElyBoolean::True)
         }() {
             return Some(body);
@@ -584,7 +584,7 @@ impl Method for Parser<'_, CacheType, CacheResult> {
             self.stream.jump(pos)
         }
         if let Some(body) = || -> Option<ElyBoolean> {
-            self.expect("false")?;
+            self.ely_keyword("false")?;
             Some(ElyBoolean::False)
         }() {
             return Some(body);
