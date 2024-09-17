@@ -48,7 +48,7 @@ where
 
 #[test]
 fn test() {
-    let code = r#" n * f(n-1) "#;
+    let code = r#" foo::bar((1,2), (3)) "#;
     let mut x = Parser::<i32, i32>::new(code).v(Verbose::Miss);
     println!("{}", expr(&mut x).unwrap())
 }

@@ -110,6 +110,7 @@ pub enum ElyEvaluation {
 #[daybreak::ast]
 pub enum ElyPrimary {
     Parentheses(Box<ElyExpression>),
+    Tuple(Vec<ElyExpression>),
     Identifier(ElyNamespace),
     Integer(ElyInteger),
     Decimal(ElyDecimal),

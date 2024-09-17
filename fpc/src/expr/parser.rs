@@ -351,6 +351,26 @@ impl Method for Parser<'_, CacheType, CacheResult> {
         let mut cut = false;
         if let Some(result) = || -> Option<ElyPrimary> {
             self.expect("(")?;
+            let first = self.ely_expression()?;
+            self.expect(",")?;
+            cut = true;
+            let second = self.ely_expression()?;
+            let mut tuple = vec![first, second];
+            while self.expect(",").is_some() {
+                let expr = self.ely_expression()?;
+                tuple.push(expr)
+            }
+            self.expect(")")?;
+            Some(ElyPrimary::Tuple(tuple))
+        }() {
+            return Some(result);
+        } else {
+            self.stream.jump(pos)
+        }
+        if cut { return None; }
+        let mut cut = false;
+        if let Some(result) = || -> Option<ElyPrimary> {
+            self.expect("(")?;
             cut = true;
             let expr = self.ely_expression()?;
             self.expect(")")?;

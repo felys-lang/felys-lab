@@ -152,6 +152,13 @@ impl Display for ElyPrimary {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             ElyPrimary::Parentheses(x) => write!(f, "({})", x),
+            ElyPrimary::Tuple(vx) => {
+                let result = vx.iter()
+                    .map(|x| x.to_string())
+                    .collect::<Vec<String>>()
+                    .join(", ");
+                write!(f, "({})", result)
+            }
             ElyPrimary::Identifier(x) => write!(f, "{}", x),
             ElyPrimary::Integer(x) => write!(f, "{}", x),
             ElyPrimary::Decimal(x) => write!(f, "{}", x),
