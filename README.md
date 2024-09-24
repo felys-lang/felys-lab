@@ -8,7 +8,7 @@ Unlike the full-stack version of current Felys, the future version will have a f
 
 ### Front-end
 
-I am familiar with PEG, which is powerful enough, so I will stick with it. See [felys-parser-collection](fpc) for expression implementation. It is a handwritten mapping from the grammar file with cache level optimization only.
+I am familiar with PEG, which is powerful enough, so I will stick with it.
 
 ### Back-end
 
@@ -25,7 +25,7 @@ Distributed under the terms of the [MIT License](https://github.com/felys-lang/f
 ## Copyright
 
 - © All rights reserved by FelysNeko
-- Signet of Elysia © All rights reserved by miHoYo
+- Elysia's signet © All rights reserved by miHoYo
 
 ## Legal Statement
 
