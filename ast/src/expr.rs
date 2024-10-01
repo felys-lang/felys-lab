@@ -18,7 +18,7 @@ pub enum Expr {
     /// function call: `func(1, 2)`
     Call(Box<Expr>, Vec<Expr>),
     /// field: `elysia.mei`, `elysia.0`
-    Field(Box<Expr>, Field),
+    Field(Box<Expr>, FieldName),
     /// for loop: `for x in array { block }`
     For(Pat, Box<Expr>, Block),
     /// group of things: `(elysia, 11.11)`
@@ -48,7 +48,7 @@ pub struct Arm {
     pub action: Box<Expr>,
 }
 
-pub enum Field {
+pub enum FieldName {
     Named(Ident),
     Anonymous(Int),
 }
