@@ -4,36 +4,38 @@ use crate::stmt::Stmt;
 
 pub enum Item {
     /// enumeration that carries represent an integer:
-    /// ```
+    /// ```ignore
     /// enum Firemoth {
     ///     Elysia,
-    ///     Kevin,
+    ///     Pardofelis,
     /// }
     /// ```
     Enum(Ident, EnumDef),
     /// statement, but not in a function:
-    /// ```
+    /// ```ignore
     /// 1 + 1;
     /// ```
     Stmt(Stmt),
     /// struct type:
-    /// ```
+    /// ```ignore
     /// struct Elysia {
-    ///     alive: bool,
+    ///     name: str,
     /// }
     /// ```
     Struct(Ident, Vec<Path>, StructDef),
     /// union type:
-    /// ```
+    /// ```ignore
     /// enum Elysia {
-    ///     HumanEgo(bool),
-    ///     MissPink(bool),
+    ///     HumanEgo(str),
+    ///     MissPink {
+    ///         name: str,
+    ///     },
     /// }
     /// ```
     Union(Ident, Vec<Path>, Vec<Variant>),
     /// import things from other files:
-    /// ```
-    /// use std::collections::{HashMap as Map, HashSet as Set};
+    /// ```ignore
+    /// use firemoth::{Elysia as Ely, Pardofelis};
     /// ```
     Use(UseTree),
 }
@@ -60,7 +62,7 @@ pub struct EnumValue {
 }
 
 pub enum StructDef {
-    Named(Vec<Field>),
+    Struct(Vec<Field>),
     Tuple(Vec<Path>),
 }
 
