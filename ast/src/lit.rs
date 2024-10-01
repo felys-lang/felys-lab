@@ -2,10 +2,14 @@ use crate::expr::Expr;
 use crate::Span;
 
 pub enum Lit {
+    /// integer: `0xf`, `0o77`, `16`, `0b1111`
     Int(Int),
+    /// decimal: `11.11`
     Deci(Deci),
+    /// boolean: `true`, `false`
     Bool(Bool),
-    Str(Str)
+    /// string: `"elysia"`, `f"{1+1} = 2"`, `r"\t\r\n"`
+    Str(Str),
 }
 
 pub enum Int {
@@ -56,7 +60,7 @@ pub enum FStrChunk {
 
 pub struct Fmt {
     pub align: Align,
-    pub len: Int
+    pub len: Int,
 }
 
 pub enum Align {

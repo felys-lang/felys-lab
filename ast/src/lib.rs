@@ -4,4 +4,4 @@ pub mod stmt;
 pub mod pat;
 pub mod item;
 
-pub struct Span(usize, usize);
+pub type Span = (usize, usize);
