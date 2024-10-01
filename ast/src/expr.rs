@@ -4,7 +4,7 @@ use crate::stmt::Block;
 
 pub enum Expr {
     /// assignment: `x = 42`
-    Assign(Pat, AssOp, Box<Expr>),
+    Assign(Box<Pat>, AssOp, Box<Expr>),
     /// break the loop: `break elysia;`
     Break(Option<Box<Expr>>),
     /// code block: `{ elysia }`
@@ -20,7 +20,7 @@ pub enum Expr {
     /// field: `elysia.mei`, `elysia.0`
     Field(Box<Expr>, FieldName),
     /// for loop: `for x in array { block }`
-    For(Pat, Box<Expr>, Block),
+    For(Box<Pat>, Box<Expr>, Block),
     /// group of things: `(elysia, 11.11)`
     Group(Vec<Expr>),
     /// match: `match x { Elysia => 1, _ => 0 }`
@@ -52,7 +52,7 @@ pub struct Arm {
 
 pub struct FieldVal {
     pub name: Ident,
-    pub value: Option<Expr>
+    pub value: Option<Expr>,
 }
 
 pub enum FieldName {

@@ -19,10 +19,7 @@ pub enum Int {
     Base2(Span),
 }
 
-pub struct Deci {
-    pub whole: Span,
-    pub frac: Span,
-}
+pub type Deci = Span;
 
 pub enum Bool {
     True,
@@ -30,8 +27,8 @@ pub enum Bool {
 }
 
 pub enum Str {
-    Plain(PStrChunk),
-    Fmt(FStrChunk),
+    Plain(Vec<PStrChunk>),
+    Fmt(Vec<FStrChunk>),
     Raw(Span),
 }
 

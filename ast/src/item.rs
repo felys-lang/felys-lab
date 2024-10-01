@@ -33,7 +33,7 @@ pub enum Item {
     /// }
     /// ```
     Union(Ident, Vec<Path>, Vec<Variant>),
-    /// import things from other files:
+    // /// import things from other files:
     /// ```ignore
     /// use firemoth::{Elysia as Ely, Pardofelis};
     /// ```
