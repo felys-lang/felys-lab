@@ -10,7 +10,7 @@ pub enum Item {
     ///     Kevin,
     /// }
     /// ```
-    Enum(Ident, Vec<EnumVal>),
+    Enum(Ident, EnumDef),
     /// statement, but not in a function:
     /// ```
     /// 1 + 1;
@@ -22,7 +22,7 @@ pub enum Item {
     ///     alive: bool,
     /// }
     /// ```
-    Struct(Ident, Vec<Path>, Vec<FieldDef>),
+    Struct(Ident, Vec<Path>, StructDef),
     /// union type:
     /// ```
     /// enum Elysia {
@@ -40,27 +40,37 @@ pub enum Item {
 
 pub struct UseTree {
     pub prefix: Path,
-    pub leaf: UseLeaf
+    pub leaf: UseLeaf,
 }
 
 pub enum UseLeaf {
     More(Vec<UseTree>),
     Alias(Option<Ident>),
-    All
+    All,
 }
 
-pub struct FieldDef {
+pub enum EnumDef {
+    Auto(Vec<Ident>),
+    Explicit(Vec<EnumValue>),
+}
+
+pub struct EnumValue {
+    pub name: Ident,
+    pub value: Int,
+}
+
+pub enum StructDef {
+    Named(Vec<Field>),
+    Tuple(Vec<Path>),
+}
+
+pub struct Field {
     pub name: Ident,
     pub kind: Path,
 }
 
-pub struct EnumVal {
-    pub name: Ident,
-    pub value: Option<Int>,
-}
-
 pub enum Variant {
-    Struct(Ident, Vec<FieldDef>),
+    Struct(Ident, Vec<Field>),
     Tuple(Ident, Vec<Path>),
     Simple(Ident),
 }
