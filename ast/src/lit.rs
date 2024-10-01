@@ -2,7 +2,7 @@ use crate::expr::Expr;
 use crate::Span;
 
 pub enum Lit {
-    /// integer: `0xf`, `0o77`, `16`, `0b1111`
+    /// integer: `0xf`, `0o77`, `15`, `0b1111`
     Int(Int),
     /// decimal: `11.11`
     Deci(Deci),
