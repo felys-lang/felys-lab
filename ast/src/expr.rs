@@ -27,8 +27,6 @@ pub enum Expr {
     Match(Box<Expr>, Vec<Arm>),
     /// if statement with optional else: `if expr { block } else { block }`
     If(Box<Expr>, Block, Option<Box<Expr>>),
-    /// return value: `return elysia`
-    Return(Option<Box<Expr>>),
     /// literals: `"elysia"`, `11.11`, `true`
     Lit(Lit),
     /// loop with not tests: `loop { block }`
@@ -37,6 +35,10 @@ pub enum Expr {
     Path(Path),
     /// explicit precedence: `(1 + 2)`
     Paren(Box<Expr>),
+    /// return value: `return elysia`
+    Return(Option<Box<Expr>>),
+    /// struct: `Elysia { cute: true }`
+    Struct(Path, Vec<FieldVal>),
     /// unary operation: `-1`
     Unary(UnaOp, Box<Expr>),
     /// while loop: `while expr { block }`
@@ -45,7 +47,12 @@ pub enum Expr {
 
 pub struct Arm {
     pub pat: Pat,
-    pub action: Box<Expr>,
+    pub action: Expr,
+}
+
+pub struct FieldVal {
+    pub name: Ident,
+    pub value: Option<Expr>
 }
 
 pub enum FieldName {
