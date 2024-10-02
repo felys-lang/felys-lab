@@ -1,4 +1,4 @@
-use crate::lit::{Int, Lit};
+use crate::lit::Lit;
 use crate::Span;
 
 pub enum Pat {
@@ -13,13 +13,13 @@ pub enum Pat {
     /// path, aka namespace: `firemoth::elysia`
     Path(Path),
     /// range: `0..=41`
-    Range(Option<Int>, Option<Int>),
+    Range(Option<Lit>, Option<Lit>),
     /// placeholder for the rest: `Elysia { alive, .. }`
     Rest,
     /// unwrap a struct: `Elysia { alive }`
     Struct(Path, Vec<PatField>),
     /// unwrap a tuple struct: `Elysia(alive)`
-    Tuple(Path, Vec<Pat>),
+    TupStruct(Path, Vec<Pat>),
 }
 
 pub struct PatField {

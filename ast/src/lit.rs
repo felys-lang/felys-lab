@@ -1,4 +1,3 @@
-use crate::expr::Expr;
 use crate::Span;
 
 pub enum Lit {
@@ -19,7 +18,10 @@ pub enum Int {
     Base2(Span),
 }
 
-pub type Deci = Span;
+pub enum Deci {
+    Finite(Span),
+    Inf,
+}
 
 pub enum Bool {
     True,
@@ -27,41 +29,7 @@ pub enum Bool {
 }
 
 pub enum Str {
-    Plain(Vec<PStrChunk>),
-    Fmt(Vec<FStrChunk>),
+    Plain(Span),
+    Format(Span),
     Raw(Span),
-}
-
-pub enum PStrChunk {
-    Raw(Span),
-    Backslash,
-    SQuote,
-    DQuote,
-    NewLine,
-    Return,
-    Tab,
-}
-
-pub enum FStrChunk {
-    Raw(Span),
-    Expr(Box<Expr>, Option<Fmt>),
-    LBrace,
-    RBrace,
-    Backslash,
-    SQuote,
-    DQuote,
-    NewLine,
-    Return,
-    Tab,
-}
-
-pub struct Fmt {
-    pub align: Align,
-    pub len: Int,
-}
-
-pub enum Align {
-    Left,
-    Right,
-    Middle,
 }
