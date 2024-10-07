@@ -1,8 +1,10 @@
-use crate::lit::{Int, Lit};
+use crate::lit::Lit;
 use crate::pat::{Ident, Pat, Path};
 use crate::stmt::Block;
 
 pub enum Expr {
+    /// array with data type: `[1, 2, 3]`
+    Array(Vec<Expr>),
     /// assignment: `x = 42`
     Assign(Box<Pat>, AssOp, Box<Expr>),
     /// break the loop: `break elysia;`
@@ -18,7 +20,7 @@ pub enum Expr {
     /// function call: `func(1, 2)`
     Call(Box<Expr>, Vec<Expr>),
     /// field: `elysia.mei`, `elysia.0`
-    Field(Box<Expr>, FieldName),
+    Field(Box<Expr>, Ident),
     /// for loop: `for x in array { block }`
     For(Box<Pat>, Box<Expr>, Block),
     /// group of things: `(elysia, 11.11)`
@@ -37,8 +39,6 @@ pub enum Expr {
     Paren(Box<Expr>),
     /// return value: `return elysia`
     Return(Option<Box<Expr>>),
-    /// struct: `Elysia { cute: true }`
-    Struct(Path, Vec<FieldVal>),
     /// unary operation: `-1`
     Unary(UnaOp, Box<Expr>),
     /// while loop: `while expr { block }`
@@ -48,16 +48,6 @@ pub enum Expr {
 pub struct Arm {
     pub pat: Pat,
     pub action: Expr,
-}
-
-pub struct FieldVal {
-    pub name: Ident,
-    pub value: Option<Expr>,
-}
-
-pub enum FieldName {
-    Named(Ident),
-    Anonymous(Int),
 }
 
 pub enum BinOp {

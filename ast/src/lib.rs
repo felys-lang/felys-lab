@@ -21,9 +21,9 @@ mod test {
     #[test]
     fn size() {
         assert_size_eq!(expr::Expr, 56);
-        assert_size_eq!(pat::Pat, 72);
+        assert_size_eq!(pat::Pat, 32);
         assert_size_eq!(lit::Lit, 32);
-        assert_size_eq!(item::Item, 72);
+        assert_size_eq!(item::Item, 64);
         assert_size_eq!(stmt::Stmt, 64);
         assert_size_eq!(expr::Expr, 56);
     }
