@@ -4,7 +4,7 @@ pub mod stmt;
 pub mod pat;
 pub mod item;
 
-pub type Span = (usize, usize);
+pub type ID = usize;
 
 
 #[cfg(test)]
@@ -12,19 +12,12 @@ pub type Span = (usize, usize);
 mod test {
     use crate::*;
 
-    macro_rules! assert_size_eq {
-        ($t:ty, $s:expr) => {
-            assert_eq!(size_of::<$t>(), $s);
-        };
-    }
-
     #[test]
     fn size() {
-        assert_size_eq!(expr::Expr, 56);
-        assert_size_eq!(pat::Pat, 32);
-        assert_size_eq!(lit::Lit, 32);
-        assert_size_eq!(item::Item, 64);
-        assert_size_eq!(stmt::Stmt, 64);
-        assert_size_eq!(expr::Expr, 56);
+        assert_eq!(size_of::<expr::Expr>(), 56);
+        assert_eq!(size_of::<pat::Pat>(), 32);
+        assert_eq!(size_of::<lit::Lit>(), 24);
+        assert_eq!(size_of::<item::Item>(), 64);
+        assert_eq!(size_of::<stmt::Stmt>(), 64);
     }
 }

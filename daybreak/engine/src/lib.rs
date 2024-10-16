@@ -1,6 +1,6 @@
-use crate::parser::memo::Memo;
-use crate::parser::stream::Stream;
-use crate::parser::table::Table;
+use crate::memo::Memo;
+use crate::stream::Stream;
+use crate::table::Table;
 
 mod memo;
 mod table;
@@ -14,11 +14,10 @@ pub struct Parser<CT, CR, S> {
 }
 
 impl<CT, CR, S> Parser<CT, CR, S> {
-    pub fn alter<T, F>(&mut self, f: F) -> (Option<T>, bool)
+    pub fn alter<T, F>(&mut self, f: F) -> Option<Option<T>>
     where
         F: Fn(&mut Parser<CT, CR, S>) -> Option<T>,
     {
-        self.cut = false;
         let mode = self.stream.strict;
         let pos = self.stream.cursor;
 
@@ -30,16 +29,20 @@ impl<CT, CR, S> Parser<CT, CR, S> {
         if result.is_none() {
             self.stream.cursor = pos;
         }
-        (result, cut)
+
+        if cut || result.is_some() {
+            Some(result)
+        } else {
+            None
+        }
     }
 
     pub fn expect(&mut self, s: &'static str) -> Option<&'static str> {
-        let (res, cut) = self.alter(|x| {
+        if let Some(res) = self.alter(|x| {
             x.stream.trim();
             x.stream.strict = true;
             s.chars().all(|c| x.stream.next() == Some(c)).then_some(s)
-        });
-        if cut || res.is_some() {
+        }) {
             return res;
         }
         None

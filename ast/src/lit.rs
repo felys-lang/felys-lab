@@ -1,4 +1,4 @@
-use crate::Span;
+use crate::ID;
 
 pub enum Lit {
     /// integer: `0xf`, `0o77`, `15`, `0b1111`
@@ -12,14 +12,14 @@ pub enum Lit {
 }
 
 pub enum Int {
-    Base16(Span),
-    Base10(Span),
-    Base8(Span),
-    Base2(Span),
+    Base16(ID),
+    Base10(ID),
+    Base8(ID),
+    Base2(ID),
 }
 
 pub enum Deci {
-    Finite(Span),
+    Finite(ID),
     Inf,
 }
 
@@ -29,7 +29,7 @@ pub enum Bool {
 }
 
 pub enum Str {
-    Plain(Span),
-    Format(Span),
-    Raw(Span),
+    Plain(ID),
+    Format(ID),
+    Raw(ID),
 }
