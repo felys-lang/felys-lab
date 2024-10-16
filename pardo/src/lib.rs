@@ -1,14 +1,10 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use crate::registry::{Base, CR, CT};
+use daybreak::Parser;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+mod lexer;
+mod registry;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+impl Base for Parser<CT, CR> {
+    type CT = CT;
+    type CR = CR;
 }

@@ -6,17 +6,17 @@ mod memo;
 mod table;
 mod stream;
 
-pub struct Parser<CT, CR, S> {
+pub struct Parser<CT, CR> {
     pub memo: Memo<CT, CR>,
-    pub table: Table<S>,
+    pub table: Table,
     pub stream: Stream,
     pub cut: bool,
 }
 
-impl<CT, CR, S> Parser<CT, CR, S> {
+impl<CT, CR, S> Parser<CT, CR> {
     pub fn alter<T, F>(&mut self, f: F) -> Option<Option<T>>
     where
-        F: Fn(&mut Parser<CT, CR, S>) -> Option<T>,
+        F: Fn(&mut Parser<CT, CR>) -> Option<T>,
     {
         let mode = self.stream.strict;
         let pos = self.stream.cursor;

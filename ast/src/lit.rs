@@ -1,3 +1,4 @@
+use crate::expr::Expr;
 use crate::ID;
 
 pub enum Lit {
@@ -29,7 +30,12 @@ pub enum Bool {
 }
 
 pub enum Str {
+    Format(Vec<Chunk>),
     Plain(ID),
-    Format(ID),
     Raw(ID),
+}
+
+pub enum Chunk {
+    Str(ID),
+    Expr(Expr),
 }
