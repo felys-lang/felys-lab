@@ -1,4 +1,4 @@
-use ast::lit::{Bool, Chunk, Deci, Int, Str};
+use ast::lit::{Bool, Deci, Int, Str};
 use ast::pat::Ident;
 
 pub struct CT;
