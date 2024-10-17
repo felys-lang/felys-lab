@@ -16,8 +16,13 @@ pub struct Parser<CT, CR> {
 impl<CT, CR> Parser<CT, CR> {
     pub fn new(code: String) -> Self {
         Self {
-            memo: Memo { body: Default::default() },
-            table: Table { body: Default::default() },
+            memo: Memo {
+                body: Default::default()
+            },
+            table: Table {
+                body: Default::default(),
+                fast: vec![],
+            },
             stream: Stream {
                 body: code,
                 strict: false,

@@ -8,3 +8,13 @@ impl Base for Parser<CT, CR> {
     type CT = CT;
     type CR = CR;
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn lexer() {
+        todo!()
+    }
+}

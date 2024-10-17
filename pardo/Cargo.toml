@@ -5,4 +5,4 @@ edition = "2021"
 
 [dependencies]
 daybreak = { path = "../daybreak" }
-ast = { path = "../ast"}
+ast = { path = "../ast" }
