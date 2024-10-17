@@ -14,6 +14,19 @@ pub struct Parser<CT, CR> {
 }
 
 impl<CT, CR> Parser<CT, CR> {
+    pub fn new(code: String) -> Self {
+        Self {
+            memo: Memo { body: Default::default() },
+            table: Table { body: Default::default() },
+            stream: Stream {
+                body: code,
+                strict: false,
+                cursor: 0,
+            },
+            cut: false,
+        }
+    }
+
     pub fn alter<T, F>(&mut self, f: F) -> Option<Option<T>>
     where
         F: Fn(&mut Parser<CT, CR>) -> Option<T>,

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::hash::Hash;
 
 pub struct Memo<T, R> {
-    body: HashMap<(usize, bool, T), (usize, Option<R>)>,
+    pub(crate) body: HashMap<(usize, bool, T), (usize, Option<R>)>,
 }
 
 impl<T: Eq + Hash, R: Clone> Memo<T, R> {

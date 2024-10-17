@@ -1,7 +1,7 @@
 pub struct Stream {
+    pub(crate) body: String,
     pub strict: bool,
     pub cursor: usize,
-    body: String,
 }
 
 impl Iterator for Stream {
