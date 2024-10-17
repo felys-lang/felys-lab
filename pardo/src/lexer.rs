@@ -137,7 +137,7 @@ impl Lexer for Parser<CT, CR> {
             }
             x.expect("\"")?;
             let id = x.table.id(body);
-            Some(Str::Plain(id))
+            Some(id)
         }) {
             return res;
         }
