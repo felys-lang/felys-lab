@@ -19,10 +19,7 @@ pub enum Int {
     Base2(ID),
 }
 
-pub enum Deci {
-    Finite(ID),
-    Inf,
-}
+pub type  Deci = ID;
 
 pub enum Bool {
     True,

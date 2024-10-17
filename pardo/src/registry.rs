@@ -1,4 +1,4 @@
-use ast::lit::{Bool, Deci, Int, Str};
+use ast::lit::{Bool, Chunk, Deci, Int, Str};
 use ast::pat::Ident;
 
 pub struct CT;
@@ -15,6 +15,7 @@ pub trait Lexer: Base {
     fn deci(&mut self) -> Option<Deci>;
     fn bool(&mut self) -> Option<Bool>;
     fn str(&mut self) -> Option<Str>;
+    fn char(&mut self) -> Option<char>;
     fn ident(&mut self) -> Option<Ident>;
     fn keyword(&mut self, s: &'static str) -> Option<&'static str>;
 }

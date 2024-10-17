@@ -13,7 +13,7 @@ pub struct Parser<CT, CR> {
     pub cut: bool,
 }
 
-impl<CT, CR, S> Parser<CT, CR> {
+impl<CT, CR> Parser<CT, CR> {
     pub fn alter<T, F>(&mut self, f: F) -> Option<Option<T>>
     where
         F: Fn(&mut Parser<CT, CR>) -> Option<T>,
