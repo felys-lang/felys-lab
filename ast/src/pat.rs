@@ -1,5 +1,5 @@
+use utils::Symbol;
 use crate::lit::Lit;
-use crate::ID;
 
 pub enum Pat {
     /// don't care: `_`
@@ -19,4 +19,4 @@ pub struct PathSeg {
     pub arg: Vec<Path>,
 }
 
-pub type Ident = ID;
+pub type Ident = Symbol;
