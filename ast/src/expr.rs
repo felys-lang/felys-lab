@@ -4,7 +4,7 @@ use crate::stmt::Stmt;
 use utils::P;
 
 pub enum Expr {
-    /// array with data type: `[1, 2, 3]`
+    /// array with the same type: `[1, 2, 3]`
     Array(Vec<Expr>),
     /// assignment: `x = 42`
     Assign(Pat, AssOp, P<Expr>),
@@ -24,8 +24,8 @@ pub enum Expr {
     Field(P<Expr>, Ident),
     /// for loop: `for x in array { block }`
     For(Pat, P<Expr>, Vec<Stmt>),
-    /// group of things: `(elysia, 11.11)`
-    Group(Vec<Expr>),
+    /// tuple: `(elysia, 11.11)`
+    Tuple(Vec<Expr>),
     /// match: `match x { Elysia => 1, _ => 0 }`
     Match(P<Expr>, Vec<Arm>),
     /// if statement with optional else: `if expr { block } else { block }`
